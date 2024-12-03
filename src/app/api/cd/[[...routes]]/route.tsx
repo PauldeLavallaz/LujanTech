@@ -24,32 +24,53 @@ async function handleRequest(request: NextRequest) {
   const url = `https://api.comfydeploy.com/api${apiPath}${search}`;
 
   console.log("[Proxy] Request URL:", url);
-  console.log("[Proxy] Request method:", request.method);
 
-  const headers = new Headers(request.headers);
-  headers.delete("host");
+  // Configurar headers básicos
+  const headers = new Headers();
   headers.set("Authorization", `Bearer ${process.env.COMFY_DEPLOY_API_KEY}`);
+  headers.set("Accept", "application/json");
+  
+  // Copiar headers relevantes de la request original
+  const requestHeaders = new Headers(request.headers);
+  if (requestHeaders.has("content-type")) {
+    headers.set("content-type", requestHeaders.get("content-type")!);
+  }
 
   try {
     const response = await fetch(url, {
       method: request.method,
       headers,
-      body: request.body,
+      body: request.method !== "GET" ? request.body : null,
     });
 
+    // Obtener el tipo de contenido de la respuesta
+    const contentType = response.headers.get("content-type") || "";
+
+    // Si la respuesta no es OK, loguear el error
     if (!response.ok) {
       const errorText = await response.text();
       console.error("[Proxy] Error response:", {
         status: response.status,
         statusText: response.statusText,
+        contentType,
         body: errorText
       });
+
+      // Devolver un error JSON limpio
+      return NextResponse.json(
+        { error: "Error calling ComfyDeploy API", details: response.statusText },
+        { status: response.status }
+      );
     }
 
-    const isStreamable = response.headers.get('Transfer-Encoding') === 'chunked' ||
-                        response.headers.get('Content-Type')?.includes('text/event-stream');
+    // Para respuestas JSON
+    if (contentType.includes("application/json")) {
+      const data = await response.json();
+      return NextResponse.json(data);
+    }
 
-    if (isStreamable) {
+    // Para respuestas streaming
+    if (contentType.includes("text/event-stream") || response.headers.get("Transfer-Encoding") === "chunked") {
       const transformStream = new TransformStream();
       const writer = transformStream.writable.getWriter();
 
@@ -63,22 +84,26 @@ async function handleRequest(request: NextRequest) {
       }));
 
       return new NextResponse(transformStream.readable, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
+        headers: {
+          "Content-Type": contentType,
+        }
       });
     }
 
-    const responseText = await response.text();
-    console.log("[Proxy] Response text:", responseText);
-
-    return new NextResponse(responseText, {
+    // Para otros tipos de respuesta
+    const text = await response.text();
+    return new NextResponse(text, {
       status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
+      headers: {
+        "Content-Type": contentType,
+      }
     });
+
   } catch (error) {
     console.error("[Proxy] Error:", error);
-    throw error;
+    return NextResponse.json(
+      { error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
   }
 }
