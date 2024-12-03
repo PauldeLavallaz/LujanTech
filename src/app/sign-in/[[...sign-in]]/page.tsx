@@ -5,10 +5,13 @@ export default function Page() {
     <div className="flex justify-center items-center h-screen">
       <SignIn 
         path="/sign-in"
+        routing="path"
+        afterSignInUrl="/"
+        afterSignUpUrl="/"
         appearance={{
           elements: {
             rootBox: "mx-auto",
-            card: "shadow-none",
+            card: "shadow-none [&_h1]:!hidden [&_h1]:after:content-['Morfeo Dreams Lab'] [&_h1]:after:block [&_p]:!hidden [&_p]:after:content-['¡Bienvenido de nuevo! Ingresá a tu cuenta para continuar.'] [&_p]:after:block",
             headerTitle: "text-2xl font-bold",
             headerSubtitle: "text-gray-600",
             formButtonPrimary: "bg-black hover:bg-black/90",
@@ -29,6 +32,10 @@ export default function Page() {
             colorPrimary: "#000000",
             colorTextSecondary: "#666666",
           },
+          layout: {
+            shimmer: "hidden",
+            showOptionalFields: false,
+          }
         }}
         signUpUrl="/sign-up"
       />

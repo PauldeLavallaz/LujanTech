@@ -25,14 +25,22 @@ export function Onboarding() {
 		<div className="flex flex-col w-full">
 			{/* Hero Section */}
 			<motion.section 
-				className="relative min-h-[calc(100vh-60px)] flex items-center justify-center bg-gradient-to-b from-gray-50 to-white mt-[60px]"
+				className="relative min-h-screen flex items-center justify-center"
 				initial="initial"
 				animate="animate"
 				variants={stagger}
 			>
+				{/* Hero Background */}
 				<div className="absolute inset-0 z-0">
-					{/* Placeholder para hero image */}
-					<div className="absolute inset-0 bg-black/5" />
+					<Image
+						src="/images/hero-bg.jpg"
+						alt="Hero background"
+						fill
+						className="object-cover brightness-[0.85]"
+						priority
+						quality={100}
+					/>
+					<div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent" />
 				</div>
 				
 				<div className="relative z-10 container mx-auto px-4 text-center">
@@ -49,7 +57,7 @@ export function Onboarding() {
 						Desbloqueá el potencial creativo de tus ideas
 					</motion.p>
 					<motion.div variants={fadeIn}>
-						<SignInButton mode="modal">
+						<SignInButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/">
 							<Button size="lg" className="rounded-full px-8 py-6 bg-black hover:bg-black/90">
 								Empezá a crear
 								<ArrowRight className="ml-2" />
