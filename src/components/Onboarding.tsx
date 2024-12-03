@@ -50,8 +50,11 @@ export function Onboarding() {
 						Desbloqueá el potencial creativo de tus ideas
 					</motion.p>
 					<motion.div variants={fadeIn} className="relative z-50">
-						<SignInButton mode="modal">
-							<Button size="lg" className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100 pointer-events-auto">
+						<SignInButton>
+							<Button 
+								size="lg" 
+								className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100 cursor-pointer"
+							>
 								Empezá a crear
 								<ArrowRight className="ml-2" />
 							</Button>
@@ -85,8 +88,11 @@ export function Onboarding() {
 					<p className="text-xl mb-12 text-gray-300 max-w-2xl mx-auto">
 						Morfeo Dreams Lab es una interfaz diseñada para que trabajes con los flujos creativos más complejos de ComfyUI sin complicaciones
 					</p>
-					<SignInButton mode="modal">
-						<Button size="lg" className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100 pointer-events-auto">
+					<SignInButton>
+						<Button 
+							size="lg" 
+							className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100 cursor-pointer"
+						>
 							Comenzá ahora
 							<ArrowRight className="ml-2" />
 						</Button>

@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback } from "react";
+import { loadSlim } from "tsparticles-slim";
 import Particles from "react-tsparticles";
-import { loadFull } from "tsparticles";
 import type { Engine } from "tsparticles-engine";
 
 export function ParticlesBackground() {
   const particlesInit = useCallback(async (engine: Engine) => {
-    await loadFull(engine);
+    await loadSlim(engine);
   }, []);
 
   return (
@@ -30,7 +30,7 @@ export function ParticlesBackground() {
           },
           move: {
             enable: true,
-            speed: 1,
+            speed: 0.5,
             direction: "none",
             random: false,
             straight: false,
@@ -39,38 +39,23 @@ export function ParticlesBackground() {
             },
           },
           number: {
-            value: window?.innerWidth < 768 ? 30 : 60,
+            value: window?.innerWidth < 768 ? 20 : 40,
             density: {
               enable: true,
               area: 800,
             },
           },
           opacity: {
-            value: 0.3,
+            value: 0.2,
           },
           shape: {
             type: "circle",
           },
           size: {
-            value: { min: 1, max: 3 },
+            value: { min: 1, max: 2 },
           },
         },
         detectRetina: true,
-        responsive: [
-          {
-            maxWidth: 768,
-            options: {
-              particles: {
-                number: {
-                  value: 30,
-                },
-                move: {
-                  speed: 0.5,
-                },
-              },
-            },
-          },
-        ],
       }}
     />
   );
