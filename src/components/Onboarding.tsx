@@ -39,7 +39,7 @@ export function Onboarding() {
 						className="relative z-50"
 					>
 						<SignInButton mode="modal">
-							<Button size="lg" className="rounded-full">
+							<Button size="lg" className="rounded-full bg-white text-black hover:bg-gray-100">
 								Empezá a crear
 								<ArrowRight className="ml-2" />
 							</Button>
