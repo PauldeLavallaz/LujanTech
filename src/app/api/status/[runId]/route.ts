@@ -10,9 +10,11 @@ export async function GET(
   try {
     const runId = params.runId;
     
-    const run = await db.query.runs.findFirst({
-      where: eq(runs.run_id, runId),
-    });
+    const [run] = await db
+      .select()
+      .from(runs)
+      .where(eq(runs.run_id, runId))
+      .limit(1);
 
     if (!run) {
       return NextResponse.json({ error: "Run not found" }, { status: 404 });
@@ -33,7 +35,8 @@ export async function GET(
     
     // Actualizar el estado en la base de datos si es necesario
     if (comfyData.status !== run.live_status) {
-      await db.update(runs)
+      await db
+        .update(runs)
         .set({ 
           live_status: comfyData.status,
           progress: comfyData.progress || 0,
