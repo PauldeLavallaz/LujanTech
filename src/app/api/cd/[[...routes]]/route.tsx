@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
 
@@ -23,6 +23,8 @@ async function handleRequest(request: NextRequest) {
   const apiPath = pathname.replace("/api/cd", "");
   const url = `https://api.comfydeploy.com/api${apiPath}${search}`;
 
+  console.log("Proxying request to:", url); // Para debugging
+
   const headers = new Headers(request.headers);
   headers.delete("host");
   headers.set("Authorization", `Bearer ${process.env.COMFY_DEPLOY_API_KEY}`);
@@ -31,29 +33,32 @@ async function handleRequest(request: NextRequest) {
     const response = await fetch(url, {
       method: request.method,
       headers,
-      body: request.body ? request.body : undefined,
+      body: request.body,
     });
 
-    // Manejo de respuestas en streaming
-    const isStreamable =
-      response.headers.get("Transfer-Encoding") === "chunked" ||
-      response.headers.get("Content-Type")?.includes("text/event-stream");
+    console.log("Response status:", response.status); // Para debugging
+    console.log("Response headers:", Object.fromEntries(response.headers.entries())); // Para debugging
+
+    // Check if the response is streamable
+    const isStreamable = response.headers.get('Transfer-Encoding') === 'chunked' ||
+                        response.headers.get('Content-Type')?.includes('text/event-stream');
 
     if (isStreamable) {
+      // Create a TransformStream to handle the streaming response
       const transformStream = new TransformStream();
       const writer = transformStream.writable.getWriter();
 
-      response.body?.pipeTo(
-        new WritableStream({
-          write(chunk) {
-            writer.write(chunk);
-          },
-          close() {
-            writer.close();
-          },
-        })
-      );
+      // Start pumping the response body to the transform stream
+      response.body?.pipeTo(new WritableStream({
+        write(chunk) {
+          writer.write(chunk);
+        },
+        close() {
+          writer.close();
+        }
+      }));
 
+      // Return a streaming response
       return new NextResponse(transformStream.readable, {
         status: response.status,
         statusText: response.statusText,
@@ -61,23 +66,14 @@ async function handleRequest(request: NextRequest) {
       });
     }
 
-    // Para respuestas no streamables
+    // For non-streaming responses, return as before
     return new NextResponse(response.body, {
       status: response.status,
       statusText: response.statusText,
       headers: response.headers,
     });
-
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error("Error fetching from ComfyDeploy API:", errorMessage);
-    
-    return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error", details: errorMessage }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    console.error("Error in proxy:", error);
+    throw error;
   }
 }
