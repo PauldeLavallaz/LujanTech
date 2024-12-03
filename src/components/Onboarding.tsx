@@ -25,32 +25,40 @@ export function Onboarding() {
 		<div className="flex flex-col w-full">
 			{/* Hero Section */}
 			<motion.section 
-				className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white"
+				className="relative min-h-screen flex items-center justify-center"
 				initial="initial"
 				animate="animate"
 				variants={stagger}
 			>
+				{/* Hero Background */}
 				<div className="absolute inset-0 z-0">
-					{/* Placeholder para hero image */}
-					<div className="absolute inset-0 bg-black/5" />
+					<Image
+						src="/images/hero-bg.jpg"
+						alt="Hero background"
+						fill
+						className="object-cover brightness-[0.85]"
+						priority
+						quality={100}
+					/>
+					<div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent" />
 				</div>
 				
 				<div className="relative z-10 container mx-auto px-4 text-center">
 					<motion.h1 
-						className="text-4xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-black to-gray-700"
+						className="text-4xl md:text-7xl font-bold mb-6 text-white"
 						variants={fadeIn}
 					>
 						Creatividad sin límites
 					</motion.h1>
 					<motion.p 
-						className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-700"
+						className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-200"
 						variants={fadeIn}
 					>
 						Desbloqueá el potencial creativo de tus ideas
 					</motion.p>
 					<motion.div variants={fadeIn} className="relative z-50">
 						<SignInButton mode="modal">
-							<Button size="lg" className="rounded-full px-8 py-6 bg-black hover:bg-black/90">
+							<Button size="lg" className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100">
 								Empezá a crear
 								<ArrowRight className="ml-2" />
 							</Button>
@@ -70,8 +78,14 @@ export function Onboarding() {
 			</section>
 
 			{/* CTA Section */}
-			<section className="py-20 bg-black text-white">
-				<div className="container mx-auto px-4 text-center">
+			<section className="w-full py-32 bg-black text-white">
+				<motion.div 
+					className="container mx-auto px-4 text-center"
+					initial={{ opacity: 0 }}
+					whileInView={{ opacity: 1 }}
+					viewport={{ once: true }}
+					transition={{ duration: 0.5 }}
+				>
 					<h2 className="text-3xl md:text-5xl font-bold mb-8">
 						Descubrí todo lo que podés lograr
 					</h2>
@@ -84,7 +98,7 @@ export function Onboarding() {
 							<ArrowRight className="ml-2" />
 						</Button>
 					</SignInButton>
-				</div>
+				</motion.div>
 			</section>
 		</div>
 	);
