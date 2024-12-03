@@ -22,10 +22,10 @@ const stagger = {
 
 export function Onboarding() {
 	return (
-		<div className="flex flex-col w-full min-h-screen">
+		<div className="flex flex-col w-full">
 			{/* Hero Section */}
 			<motion.section 
-				className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white"
+				className="relative min-h-[calc(100vh-60px)] flex items-center justify-center bg-gradient-to-b from-gray-50 to-white mt-[60px]"
 				initial="initial"
 				animate="animate"
 				variants={stagger}
@@ -37,13 +37,13 @@ export function Onboarding() {
 				
 				<div className="relative z-10 container mx-auto px-4 text-center">
 					<motion.h1 
-						className="text-4xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600"
+						className="text-4xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-black to-gray-700"
 						variants={fadeIn}
 					>
 						Creatividad sin límites
 					</motion.h1>
 					<motion.p 
-						className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-600"
+						className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-700"
 						variants={fadeIn}
 					>
 						Desbloqueá el potencial creativo de tus ideas
@@ -60,7 +60,7 @@ export function Onboarding() {
 			</motion.section>
 
 			{/* Features Section */}
-			<section className="py-32 bg-white">
+			<section className="w-full py-32 bg-white">
 				<motion.div 
 					className="container mx-auto px-4"
 					initial={{ opacity: 0 }}
@@ -92,7 +92,7 @@ export function Onboarding() {
 			</section>
 
 			{/* How it works */}
-			<section className="py-32 bg-gray-50">
+			<section className="w-full py-32 bg-gray-50">
 				<motion.div 
 					className="container mx-auto px-4"
 					initial={{ opacity: 0 }}
@@ -124,7 +124,7 @@ export function Onboarding() {
 			</section>
 
 			{/* CTA Section */}
-			<section className="py-32 bg-black text-white">
+			<section className="w-full py-32 bg-black text-white">
 				<motion.div 
 					className="container mx-auto px-4 text-center"
 					initial={{ opacity: 0 }}
@@ -153,15 +153,15 @@ export function Onboarding() {
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
 	return (
 		<motion.div 
-			className="p-6 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors"
-			whileHover={{ y: -5 }}
+			className="p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-100"
+			whileHover={{ y: -5, boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}
 			transition={{ duration: 0.2 }}
 		>
-			<div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center mb-4">
+			<div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center mb-6">
 				{icon}
 			</div>
-			<h3 className="text-xl font-semibold mb-2">{title}</h3>
-			<p className="text-gray-600">{description}</p>
+			<h3 className="text-xl font-semibold mb-3">{title}</h3>
+			<p className="text-gray-600 leading-relaxed">{description}</p>
 		</motion.div>
 	);
 }
@@ -169,13 +169,13 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
 function ProcessStep({ number, title, description }: { number: string; title: string; description: string }) {
 	return (
 		<motion.div 
-			className="text-center"
-			whileHover={{ scale: 1.05 }}
+			className="text-center p-6"
+			whileHover={{ scale: 1.02 }}
 			transition={{ duration: 0.2 }}
 		>
-			<div className="text-6xl font-bold text-black/10 mb-4">{number}</div>
-			<h3 className="text-xl font-semibold mb-2">{title}</h3>
-			<p className="text-gray-600">{description}</p>
+			<div className="text-7xl font-bold text-black/5 mb-6">{number}</div>
+			<h3 className="text-2xl font-semibold mb-3">{title}</h3>
+			<p className="text-gray-600 leading-relaxed max-w-sm mx-auto">{description}</p>
 		</motion.div>
 	);
 }
