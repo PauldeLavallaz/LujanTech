@@ -3,27 +3,6 @@ import { runs } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm/expressions";
 
-async function promptOptimizer(prompt: string): Promise<string> {
-    console.log("Optimizing prompt with assistant...");
-    try {
-        const response = await fetch("https://hook.us2.make.com/rdpyblg9ov0hrjcqhsktc8l7o6gmiwsc", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt }),
-        });
-
-        if (!response.ok) {
-            console.error(`Failed to optimize prompt: ${response.statusText}`);
-            return prompt;
-        }
-
-        const result = await response.json();
-        return result?.choices?.[0]?.content ?? prompt;
-    } catch (error: any) {
-        console.error("Error optimizing the prompt:", error.message || error);
-        return prompt;
-    }
-}
 
 export async function generateImage(
     prompt: string,
@@ -48,14 +27,12 @@ export async function generateImage(
     await db.insert(runs).values({
       run_id,
       user_id: userId,
-      live_status: "optimizing_prompt",
+      live_status: "queued",
       inputs: inputsForDB,
     });
   
-    const optimizedPrompt = prompt;
-  
     const inputsForAPI = {
-      prompt: optimizedPrompt,
+      prompt: prompt,
       height,
       width,
       lora,
@@ -81,10 +58,9 @@ export async function generateImage(
       }
   
       const result = await response.json();
-      if (result?.run_id) {
+      if (result?.id) {
         await db.update(runs).set({
-          live_status: "queued",
-          inputs: inputsForDB,
+          live_status: "processing",
         }).where(eq(runs.run_id, run_id));
         return run_id;
       } else {
@@ -92,6 +68,9 @@ export async function generateImage(
       }
     } catch (error) {
       console.error("Error calling ComfyDeploy API:", error);
+      await db.update(runs).set({
+        live_status: "error",
+      }).where(eq(runs.run_id, run_id));
       throw new Error("Error generating image");
     }
   }

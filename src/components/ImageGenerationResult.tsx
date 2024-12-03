@@ -13,40 +13,46 @@ export function ImageGenerationResult({
   className,
 }: { runId: string } & React.ComponentProps<"div">) {
   const [image, setImage] = useState("");
-  const [status, setStatus] = useState<string>("optimizing_prompt");
-  const [progress, setProgress] = useState<number | undefined>();
-  const [liveStatus, setLiveStatus] = useState<string | null>();
+  const [status, setStatus] = useState<string>("queued");
+  const [progress, setProgress] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
-  const { data, isLoading } = useComfyQuery<any, any, any, ComfyDeployRun>(
-    "run",
-    "get",
-    [
-      {
-        runId: runId,
-      },
-    ],
-    {
-      refetchInterval: 2000,
-    },
-  );
-
   useEffect(() => {
-    if (data) {
-      const res = data;
-      setStatus(res.status);
-      setProgress(res.progress);
-      setLiveStatus(res.liveStatus ?? null);
-
-      if (res.status === "success") {
-        const imageUrl = res.outputs?.[0]?.data?.images?.[0]?.url ?? "";
-        if (imageUrl) {
-          setImage(imageUrl);
-          setLoading(false);
+    const checkStatus = async () => {
+      try {
+        const response = await fetch(`/api/status/${runId}`);
+        const data = await response.json();
+        
+        if (data.live_status) {
+          setStatus(data.live_status);
         }
+        
+        if (data.progress) {
+          setProgress(data.progress);
+        }
+
+        if (data.image_url) {
+          setImage(data.image_url);
+          setLoading(false);
+          return true; // Imagen encontrada
+        }
+        
+        return false; // Imagen aún no disponible
+      } catch (error) {
+        console.error("Error checking status:", error);
+        return false;
       }
-    }
-  }, [data]);
+    };
+
+    const interval = setInterval(async () => {
+      const imageFound = await checkStatus();
+      if (imageFound) {
+        clearInterval(interval);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [runId]);
 
   return (
     <div
@@ -58,26 +64,19 @@ export function ImageGenerationResult({
       {!loading && image && (
         <img className="w-full h-full" src={image} alt="Generated image" />
       )}
-      {!image && status && (
+      {!image && (
         <div className="absolute z-10 top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 px-4">
           <div className="flex items-center justify-center gap-2 text-gray-600">
-            {status === "optimizing_prompt" && "Optimizing prompt..."}
-            {status === "sending_to_comfy" && "Sending to ComfyDeploy..."}
-            {status === "queued" && "Queued..."}
-            {status === "processing" && "Processing..."}
-            {status === "completed" && "Completed!"}
-            {status === "error" && "An error occurred!"}
+            {status === "queued" && "En cola..."}
+            {status === "processing" && "Procesando..."}
+            {status === "completed" && "¡Completado!"}
+            {status === "error" && "¡Ocurrió un error!"}
             <LoadingIcon />
           </div>
-          {progress !== undefined && (
-            <Progress value={progress * 100} className="h-[2px] w-full" />
-          )}
-          <span className="text-sm text-center text-gray-400">
-            {liveStatus !== undefined && liveStatus}
-          </span>
+          <Progress value={progress * 100} className="h-[2px] w-full" />
         </div>
       )}
-      {loading && <Skeleton className="w-full h-full" />}
+      {loading && !image && <Skeleton className="w-full h-full" />}
     </div>
   );
 }
