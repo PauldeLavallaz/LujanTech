@@ -14,7 +14,7 @@ import { ImageModal } from "./ImageModal";
 
 export function App() {
   const [formData, setFormData] = useState({
-    prompt: "A photo of a crystal ball. Realistic National geographic photo, epic",
+    prompt: "",
     height: 1152,
     width: 896,
     lora: "",
@@ -32,6 +32,11 @@ export function App() {
   };
 
   const handleGenerate = async () => {
+    if (!formData.prompt.trim()) {
+      toast.error("Por favor ingresa un prompt");
+      return;
+    }
+
     setIsGenerating(true);
   
     try {
@@ -114,7 +119,7 @@ export function App() {
           <div className="grid grid-cols-2 gap-4">
             {/* Left Column: Dimensions */}
             <div className="space-y-2">
-              <label className="text-xs font-medium">Dimensions</label>
+              <label className="text-xs font-medium">Tamaño (en pixeles)</label>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Input
@@ -125,7 +130,7 @@ export function App() {
                     onChange={(e) => handleSelection("width", Math.min(2048, Math.max(512, parseInt(e.target.value) || 512)))}
                     className="h-8 text-xs"
                   />
-                  <span className="text-[10px] text-gray-500">Width</span>
+                  <span className="text-[10px] text-gray-500">Ancho</span>
                 </div>
                 <div>
                   <Input
@@ -136,7 +141,7 @@ export function App() {
                     onChange={(e) => handleSelection("height", Math.min(2048, Math.max(512, parseInt(e.target.value) || 512)))}
                     className="h-8 text-xs"
                   />
-                  <span className="text-[10px] text-gray-500">Height</span>
+                  <span className="text-[10px] text-gray-500">Alto</span>
                 </div>
               </div>
             </div>
