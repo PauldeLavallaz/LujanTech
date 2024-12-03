@@ -21,7 +21,7 @@ process.on("exit", () => {
 
 process.on("SIGINT", () => {
 	tunnel.close();
-	// console.log("Tunnel closed due to SIGINT.");
+	// console.log("Tunnel closed due to SIGINT.")a;
 	process.exit();
 });
 
