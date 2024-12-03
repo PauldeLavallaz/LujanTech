@@ -1,7 +1,7 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
-  "id": "2d74131e-3a7d-481d-9ca3-49a23513bb4c",
+  "id": "13daeb9d-35a2-4aec-8472-d7ba64926f7b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "runs": {
@@ -35,18 +35,44 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "inputs": {
+          "name": "inputs",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "live_status": {
+          "name": "live_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "progress": {
+          "name": "progress",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
+  "views": {},
   "enums": {},
   "_meta": {
     "schemas": {},
     "tables": {},
     "columns": {}
+  },
+  "internal": {
+    "indexes": {}
   }
 }

@@ -1,26 +1,12 @@
 {
-  "version": "5",
+  "version": "7",
   "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1716786843560,
-      "tag": "0000_hesitant_mephistopheles",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1716787043557,
-      "tag": "0001_gifted_annihilus",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1722890971223,
-      "tag": "0002_freezing_weapon_omega",
+      "version": "6",
+      "when": 1733186391747,
+      "tag": "0000_windy_gunslinger",
       "breakpoints": true
     }
   ]

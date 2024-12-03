@@ -8,7 +8,7 @@ export const runs = sqliteTable("runs", {
 	  sql`(strftime('%s', 'now'))`,
 	),
 	image_url: text("image_url"),
-	inputs: text("inputs", { mode: "json" }).$type<Record<string, string>>(),
+	inputs: text("inputs", { mode: "json" }).$type<Record<string, any>>(),
 	live_status: text("live_status"),  // Este es el estado que usaremos
 	progress: real("progress"),
   });
