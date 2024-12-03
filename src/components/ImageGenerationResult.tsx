@@ -20,57 +20,22 @@ export function ImageGenerationResult({
 
     const checkStatus = async () => {
       try {
-        console.log("[Status Check] Checking runId:", runId);
         const response = await fetch(`/api/cd/run/${runId}`);
-        
-        if (!response.ok) {
-          console.error("[Status Check] Error response:", {
-            status: response.status,
-            statusText: response.statusText
-          });
-          const errorText = await response.text();
-          console.error("[Status Check] Error body:", errorText);
-          return false;
-        }
-
         const data = await response.json();
-        console.log("[Status Check] Response data:", data);
+        
+        console.log("[Status Check] Response:", data);
 
         if (data.status) {
-          console.log("Current status:", data.status);
-          switch (data.status) {
-            case "not-started":
-              setStatus("queued");
-              break;
-            case "running":
-              setStatus("processing");
-              break;
-            case "uploading":
-              setStatus("processing");
-              setProgress(0.95);
-              break;
-            case "success":
-              setStatus("completed");
-              setProgress(1);
-              break;
-            default:
-              setStatus(data.status);
-          }
-        }
-        
-        if (typeof data.progress === 'number') {
-          setProgress(data.progress);
+          setStatus(data.status);
+          setProgress(data.progress || 0);
         }
 
-        if (data.status === "success" && data.outputs && data.outputs.length > 0) {
-          const imageUrl = data.outputs[0]?.data?.images?.[0]?.url;
-          if (imageUrl) {
-            setImage(imageUrl);
-            setLoading(false);
-            return true;
-          }
+        if (data.outputs?.[0]?.data?.images?.[0]?.url) {
+          setImage(data.outputs[0].data.images[0].url);
+          setLoading(false);
+          return true;
         }
-        
+
         return false;
       } catch (error) {
         console.error("[Status Check] Error:", error);

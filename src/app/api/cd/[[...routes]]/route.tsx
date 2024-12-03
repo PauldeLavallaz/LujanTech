@@ -25,85 +25,64 @@ async function handleRequest(request: NextRequest) {
 
   console.log("[Proxy] Request URL:", url);
 
-  // Configurar headers básicos
-  const headers = new Headers();
-  headers.set("Authorization", `Bearer ${process.env.COMFY_DEPLOY_API_KEY}`);
-  headers.set("Accept", "application/json");
-  
-  // Copiar headers relevantes de la request original
-  const requestHeaders = new Headers(request.headers);
-  if (requestHeaders.has("content-type")) {
-    headers.set("content-type", requestHeaders.get("content-type")!);
-  }
+  // Headers simplificados para la API
+  const headers = {
+    "Authorization": `Bearer ${process.env.COMFY_DEPLOY_API_KEY}`,
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+  };
 
   try {
     const response = await fetch(url, {
       method: request.method,
       headers,
-      body: request.method !== "GET" ? request.body : null,
+      // Solo incluir body para métodos que no sean GET
+      ...(request.method !== "GET" && {
+        body: request.body
+      })
     });
 
-    // Obtener el tipo de contenido de la respuesta
-    const contentType = response.headers.get("content-type") || "";
-
-    // Si la respuesta no es OK, loguear el error
+    // Si la respuesta no es OK, intentar obtener el error detallado
     if (!response.ok) {
-      const errorText = await response.text();
+      let errorDetails;
+      try {
+        errorDetails = await response.json();
+      } catch {
+        errorDetails = await response.text();
+      }
+
       console.error("[Proxy] Error response:", {
         status: response.status,
         statusText: response.statusText,
-        contentType,
-        body: errorText
+        details: errorDetails
       });
 
-      // Devolver un error JSON limpio
-      return NextResponse.json(
-        { error: "Error calling ComfyDeploy API", details: response.statusText },
-        { status: response.status }
-      );
+      return NextResponse.json({
+        error: "Error calling ComfyDeploy API",
+        status: response.status,
+        details: errorDetails
+      }, { status: response.status });
     }
 
-    // Para respuestas JSON
-    if (contentType.includes("application/json")) {
+    // Intentar devolver JSON si es posible
+    try {
       const data = await response.json();
       return NextResponse.json(data);
-    }
-
-    // Para respuestas streaming
-    if (contentType.includes("text/event-stream") || response.headers.get("Transfer-Encoding") === "chunked") {
-      const transformStream = new TransformStream();
-      const writer = transformStream.writable.getWriter();
-
-      response.body?.pipeTo(new WritableStream({
-        write(chunk) {
-          writer.write(chunk);
-        },
-        close() {
-          writer.close();
-        }
-      }));
-
-      return new NextResponse(transformStream.readable, {
+    } catch {
+      // Si no es JSON, devolver el texto
+      const text = await response.text();
+      return new NextResponse(text, {
+        status: response.status,
         headers: {
-          "Content-Type": contentType,
+          "Content-Type": "text/plain",
         }
       });
     }
-
-    // Para otros tipos de respuesta
-    const text = await response.text();
-    return new NextResponse(text, {
-      status: response.status,
-      headers: {
-        "Content-Type": contentType,
-      }
-    });
-
   } catch (error) {
     console.error("[Proxy] Error:", error);
-    return NextResponse.json(
-      { error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      error: "Internal server error",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 });
   }
 }
