@@ -3,10 +3,8 @@
 import { LoadingIcon } from "@/components/LoadingIcon";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useComfyQuery } from "@/hooks/hooks";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { ComfyDeployRun } from "../types/types";
 
 export function ImageGenerationResult({
   runId,
@@ -18,26 +16,32 @@ export function ImageGenerationResult({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!runId) return;
+
     const checkStatus = async () => {
       try {
-        const response = await fetch(`/api/status/${runId}`);
+        const response = await fetch(`/api/cd/run/${runId}`);
         const data = await response.json();
         
-        if (data.live_status) {
-          setStatus(data.live_status);
+        console.log("Status check response:", data); // Para debugging
+
+        if (data.status) {
+          setStatus(data.status);
         }
         
-        if (data.progress) {
+        if (typeof data.progress === 'number') {
           setProgress(data.progress);
         }
 
-        if (data.image_url) {
-          setImage(data.image_url);
+        // Verificar si hay imagen disponible
+        const imageUrl = data.outputs?.[0]?.data?.images?.[0]?.url;
+        if (imageUrl) {
+          setImage(imageUrl);
           setLoading(false);
           return true; // Imagen encontrada
         }
         
-        return false; // Imagen aún no disponible
+        return false; // Continuar polling
       } catch (error) {
         console.error("Error checking status:", error);
         return false;
@@ -62,7 +66,7 @@ export function ImageGenerationResult({
       )}
     >
       {!loading && image && (
-        <img className="w-full h-full" src={image} alt="Generated image" />
+        <img className="w-full h-full object-cover" src={image} alt="Generated image" />
       )}
       {!image && (
         <div className="absolute z-10 top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 px-4">
@@ -74,6 +78,9 @@ export function ImageGenerationResult({
             <LoadingIcon />
           </div>
           <Progress value={progress * 100} className="h-[2px] w-full" />
+          <span className="text-sm text-center text-gray-400">
+            {progress > 0 && `${Math.round(progress * 100)}%`}
+          </span>
         </div>
       )}
       {loading && !image && <Skeleton className="w-full h-full" />}
