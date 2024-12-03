@@ -43,7 +43,7 @@ export function Onboarding() {
 					<div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent" />
 				</div>
 				
-				<div className="relative z-10 container mx-auto px-4 text-center">
+				<div className="relative z-20 container mx-auto px-4 text-center">
 					<motion.h1 
 						className="text-4xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-black to-gray-700"
 						variants={fadeIn}
@@ -56,12 +56,9 @@ export function Onboarding() {
 					>
 						Desbloqueá el potencial creativo de tus ideas
 					</motion.p>
-					<motion.div variants={fadeIn}>
-						<SignInButton>
-							<Button 
-								size="lg" 
-								className="rounded-full px-8 py-6 bg-black hover:bg-black/90 cursor-pointer"
-							>
+					<motion.div variants={fadeIn} className="relative z-50">
+						<SignInButton mode="modal">
+							<Button size="lg" className="rounded-full px-8 py-6 bg-black hover:bg-black/90">
 								Empezá a crear
 								<ArrowRight className="ml-2" />
 							</Button>
