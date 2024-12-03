@@ -23,8 +23,15 @@ const stagger = {
 export function Onboarding() {
 	const { signIn } = useSignIn();
 
-	const handleSignIn = () => {
-		signIn?.redirectToSignIn({ redirectUrl: "/" });
+	const handleSignIn = async () => {
+		try {
+			await signIn?.create({
+				redirectUrl: '/',
+				strategy: 'oauth_google'
+			});
+		} catch (err) {
+			console.error('Error signing in:', err);
+		}
 	};
 
 	return (
