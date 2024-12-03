@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { mutate } from "swr";
 import { useDebounce } from "use-debounce";
 import { cn } from "@/lib/utils";
+import { ImageModal } from "./ImageModal";
 
 export function App() {
   const [formData, setFormData] = useState({
@@ -98,13 +99,16 @@ export function App() {
       <Card className="w-full max-w-lg p-4 shadow-lg rounded-none md:rounded-2xl">
         <div className="flex flex-col gap-3">
           {/* Prompt Input */}
-          <Input
-            id="input"
-            className="rounded-xl text-sm"
-            value={formData.prompt}
-            onChange={(e) => handleSelection("prompt", e.target.value)}
-            placeholder="Enter a prompt to generate an image"
-          />
+          <div className="space-y-2">
+            <label className="text-xs font-medium">Prompt</label>
+            <Input
+              id="input"
+              className="rounded-xl text-sm"
+              value={formData.prompt}
+              onChange={(e) => handleSelection("prompt", e.target.value)}
+              placeholder="A photo of..."
+            />
+          </div>
 
           {/* Dimensions & LoRA */}
           <div className="grid grid-cols-2 gap-4">
@@ -135,39 +139,11 @@ export function App() {
                   <span className="text-[10px] text-gray-500">Height</span>
                 </div>
               </div>
-
-              {/* Aspect Ratios */}
-              <div className="grid grid-cols-2 gap-1">
-                {[
-                  { height: 1152, width: 896, label: "896×1152" },
-                  { height: 896, width: 1152, label: "1152×896" },
-                  { height: 1024, width: 1024, label: "1024²" },
-                  { height: 768, width: 768, label: "768²" },
-                ].map((option) => (
-                  <Button
-                    key={option.label}
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      "h-6 text-xs rounded",
-                      formData.height === option.height && formData.width === option.width
-                        ? "bg-blue-500 text-white hover:bg-blue-600"
-                        : "hover:bg-gray-100"
-                    )}
-                    onClick={() => {
-                      handleSelection("height", option.height);
-                      handleSelection("width", option.width);
-                    }}
-                  >
-                    {option.label}
-                  </Button>
-                ))}
-              </div>
             </div>
 
             {/* Right Column: LoRA */}
             <div className="space-y-2">
-              <label className="text-xs font-medium">LoRA Settings</label>
+              <label className="text-xs font-medium">Elegí tu LoRA</label>
               <select
                 value={formData.lora}
                 onChange={(e) => handleSelection("lora", e.target.value)}
@@ -205,7 +181,7 @@ export function App() {
               onClick={handleGenerate}
               disabled={isGenerating}
             >
-              {isGenerating ? "Generating..." : "Generate"}
+              {isGenerating ? "Generando..." : "Generar"}
             </Button>
             <Button
               variant="outline"
