@@ -33,8 +33,8 @@ export default function Page() {
             colorTextSecondary: "#666666",
           },
           layout: {
-            shimmer: "hidden",
             showOptionalFields: false,
+            socialButtonsPlacement: "bottom"
           }
         }}
         signUpUrl="/sign-up"
