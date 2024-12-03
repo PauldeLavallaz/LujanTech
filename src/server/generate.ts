@@ -17,52 +17,40 @@ export async function generateImage(
   if (!userId) throw new Error("User not found");
 
   const { height, width, lora } = options;
-  const run_id = `run_${Date.now()}`;
-
-  await db.insert(runs).values({
-    run_id,
-    user_id: userId,
-    live_status: "queued",
-    inputs: {
-      prompt,
-      height: height.toString(),
-      width: width.toString(),
-      lora,
-      lora_strength: "0.1"
-    },
-  });
 
   try {
     const result = await cd.run.queue({
       deploymentId: "e322689e-065a-4d33-aa6a-ee941803ca95",
       webhook: `${endpoint}/api/webhook`,
       inputs: {
+        lora_strength: 0.5,
         prompt,
-        height,
+        lora: lora || "",
         width,
-        lora,
-        lora_strength: 0.1
+        height
       }
     });
 
-    if (result?.runId) {
-      await db.update(runs)
-        .set({
-          live_status: "processing",
-        })
-        .where(eq(runs.run_id, run_id));
-      
-      return run_id;
-    } else {
-      throw new Error("No run_id received from ComfyDeploy");
+    if (!result?.runId) {
+      throw new Error("No runId received from ComfyDeploy");
     }
+
+    await db.insert(runs).values({
+      run_id: result.runId,
+      user_id: userId,
+      live_status: "queued",
+      inputs: {
+        prompt,
+        height: height.toString(),
+        width: width.toString(),
+        lora,
+        lora_strength: "0.5"
+      },
+    });
+
+    return result.runId;
   } catch (error) {
     console.error("Error calling ComfyDeploy API:", error);
-    await db.update(runs)
-      .set({
-        live_status: "error",
-      })
-      .where(eq(runs.run_id, run_id));
     throw error;
   }
 }
