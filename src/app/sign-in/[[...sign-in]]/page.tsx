@@ -17,37 +17,18 @@ export default function Page() {
             socialButtonsBlockButton: "rounded-xl",
             dividerLine: "bg-gray-200",
             dividerText: "text-gray-400",
+            headerTitle__signIn: "after:content-['Morfeo Dreams Lab']",
+            headerSubtitle__signIn: "after:content-['Continuá tu viaje creativo']",
+            socialButtonsBlockButton__google: "after:content-['Continuar con Google']",
+            formFieldLabel__emailAddress: "after:content-['Correo electrónico']",
+            formButtonPrimary__signIn: "after:content-['Continuar']",
+            footerActionText__signIn: "after:content-['¿No tenés una cuenta?']",
+            footerActionLink__signIn: "after:content-['Registrate']",
           },
           variables: {
             colorPrimary: "#000000",
             colorTextSecondary: "#666666",
           },
-        }}
-        translations={{
-          signIn: {
-            start: {
-              title: "Iniciá sesión en Morfeo Dreams Lab",
-              subtitle: "Continuá tu viaje creativo",
-            },
-            social: {
-              google: {
-                buttonText: "Continuar con Google",
-              },
-            },
-            emailCode: {
-              title: "Iniciá sesión en Morfeo Dreams Lab",
-              subtitle: "Continuá tu viaje creativo",
-            },
-            password: {
-              title: "Iniciá sesión en Morfeo Dreams Lab",
-              subtitle: "Continuá tu viaje creativo",
-            },
-          },
-          dividerText: "o",
-          formFieldLabel__emailAddress: "Correo electrónico",
-          formButtonPrimary: "Continuar",
-          footerActionText: "¿No tenés una cuenta?",
-          footerActionLink: "Registrate",
         }}
         signUpUrl="/sign-up"
       />
