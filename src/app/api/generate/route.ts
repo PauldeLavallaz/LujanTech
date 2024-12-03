@@ -3,26 +3,23 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    // Leer el cuerpo de la solicitud
     const body = await request.json();
-    const { prompt, height, width, lora, batchSize } = body;
+    const { prompt, height, width, lora } = body;
 
-    // Validar que todos los campos están presentes
-    if (!prompt || !height || !width || !lora || !batchSize) {
+    if (!prompt || !height || !width) {
       return NextResponse.json(
-        { error: "Faltan campos requeridos: prompt, height, width, lora, batchSize" },
+        { error: "Faltan campos requeridos: prompt, height, width" },
         { status: 400 }
       );
     }
 
     const endpoint = request.nextUrl.origin;
 
-    // Llamar a la función generateImage con los datos validados
     const run_id = await generateImage(prompt, endpoint, {
       height: parseInt(height, 10),
       width: parseInt(width, 10),
-      lora,
-      batchSize: parseInt(batchSize, 10),
+      lora: lora || "",
+      batchSize: 1,
     });
 
     return NextResponse.json({ run_id }, { status: 200 });

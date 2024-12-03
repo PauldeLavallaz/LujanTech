@@ -33,7 +33,7 @@ export async function generateImage(
     const { userId } = auth();
     if (!userId) throw new Error("User not found");
   
-    const { height, width, lora, batchSize } = options;
+    const { height, width, lora } = options;
   
     const run_id = `run_${Date.now()}`;
   
@@ -42,7 +42,7 @@ export async function generateImage(
       height: height.toString(),
       width: width.toString(),
       lora,
-      batchSize: batchSize.toString(),
+      lora_strength: "0.1"
     };
   
     await db.insert(runs).values({
@@ -55,22 +55,22 @@ export async function generateImage(
     const optimizedPrompt = prompt;
   
     const inputsForAPI = {
-      input_text: optimizedPrompt,
-      height: height.toString(),
-      width: width.toString(),
+      prompt: optimizedPrompt,
+      height,
+      width,
       lora,
-      batch: batchSize.toString(),
+      lora_strength: 0.1
     };
   
     try {
-      const response = await fetch("https://www.comfydeploy.com/api/run", {
+      const response = await fetch("https://api.comfydeploy.com/api/run/queue", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${process.env.COMFY_DEPLOY_API_KEY}`,
         },
         body: JSON.stringify({
-          deployment_id: process.env.COMFY_DEPLOY_WF_DEPLOYMENT_ID,
+          deployment_id: "e322689e-065a-4d33-aa6a-ee941803ca95",
           inputs: inputsForAPI,
           webhook: `${endpoint}/api/webhook`,
         }),

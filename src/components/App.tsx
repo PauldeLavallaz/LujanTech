@@ -13,11 +13,11 @@ import { cn } from "@/lib/utils";
 
 export function App() {
   const [formData, setFormData] = useState({
-    prompt: "beautiful scenery nature glass bottle landscape, purple galaxy bottle",
-    height: 512,
-    width: 512,
+    prompt: "A photo of a crystal ball. Realistic National geographic photo, epic",
+    height: 1152,
+    width: 896,
     lora: "",
-    batchSize: 1,
+    lora_strength: 0.1
   });
   const [debouncedPrompt] = useDebounce(formData.prompt, 200);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -42,7 +42,7 @@ export function App() {
           height: formData.height,
           width: formData.width,
           lora: formData.lora,
-          batchSize: formData.batchSize,
+          lora_strength: formData.lora_strength
         }),
       });
   
@@ -97,11 +97,10 @@ export function App() {
             <label className="text-sm font-medium">Height & Width:</label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { height: 512, width: 512, label: "512x512" },
-                { height: 768, width: 1024, label: "768x1024" },
-                { height: 1024, width: 768, label: "1024x768" },
-                { height: 1280, width: 720, label: "1280x720" },
-                { height: 1920, width: 1080, label: "1920x1080" },
+                { height: 1152, width: 896, label: "896x1152" },
+                { height: 896, width: 1152, label: "1152x896" },
+                { height: 1024, width: 1024, label: "1024x1024" },
+                { height: 768, width: 768, label: "768x768" },
               ].map((option) => (
                 <Button
                   key={option.label}
@@ -135,25 +134,6 @@ export function App() {
               <option value="lora2">LoRA 2</option>
               <option value="lora3">LoRA 3</option>
             </select>
-          </div>
-
-          {/* Batch Size */}
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Batch Size:</label>
-            <div className="flex gap-2">
-              {[1, 2, 4].map((size) => (
-                <Button
-                  key={size}
-                  className={cn(
-                    "rounded-md p-2",
-                    formData.batchSize === size ? "bg-blue-500 text-white" : "bg-gray-200"
-                  )}
-                  onClick={() => handleSelection("batchSize", size)}
-                >
-                  {size} {size === 1 ? "Image" : "Images"}
-                </Button>
-              ))}
-            </div>
           </div>
 
           {/* Generate Button */}
