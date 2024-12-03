@@ -3,16 +3,12 @@ import { runs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
-interface RouteParams {
-  runId: string;
-}
-
 export async function GET(
   request: NextRequest,
-  { params }: { params: RouteParams }
+  context: { params: { runId: string } }
 ) {
   try {
-    const runId = params.runId;
+    const { runId } = context.params;
     
     const [run] = await db
       .select()
