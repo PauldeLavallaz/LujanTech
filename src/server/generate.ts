@@ -58,7 +58,7 @@ export async function generateImage(
       
       console.log("ComfyDeploy API Response:", result);
       
-      if (result?.id) {
+      if (result?.run_id) {
         await db.update(runs)
           .set({
             live_status: "processing",
