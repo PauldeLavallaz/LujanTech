@@ -1,7 +1,7 @@
 import { db } from "@/db/db";
 import { runs } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { eq, or, isNull } from "drizzle-orm";
+import { eq, and, or, isNull } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function POST() {
@@ -12,13 +12,16 @@ export async function POST() {
     }
 
     // Eliminar solo las ejecuciones trabadas (sin imagen y en estado queued/processing)
-    await db.delete(runs)
-      .where(eq(runs.user_id, userId))
-      .where(isNull(runs.image_url))
-      .where(or(
-        eq(runs.live_status, "queued"),
-        eq(runs.live_status, "processing")
-      ));
+    await db.delete(runs).where(
+      and(
+        eq(runs.user_id, userId),
+        isNull(runs.image_url),
+        or(
+          eq(runs.live_status, "queued"),
+          eq(runs.live_status, "processing")
+        )
+      )
+    );
 
     return NextResponse.json({ message: "Cleaned successfully" });
   } catch (error) {
