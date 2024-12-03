@@ -61,7 +61,21 @@ export function App() {
       setIsGenerating(false);
     }
   };
-   
+
+  const handleCleanStuckRuns = async () => {
+    try {
+      const response = await fetch("/api/clean", { method: "POST" });
+      if (response.ok) {
+        toast.success("Ejecuciones trabadas limpiadas");
+        mutate("userRuns"); // Refrescar la lista
+      } else {
+        toast.error("Error al limpiar las ejecuciones");
+      }
+    } catch (error) {
+      console.error("Error cleaning stuck runs:", error);
+      toast.error("Error al limpiar las ejecuciones");
+    }
+  };
 
   useEffect(() => {
     if (runId) {
@@ -178,14 +192,24 @@ export function App() {
           </div>
 
           {/* Generate Button */}
-          <Button
-            variant="expandIcon"
-            className={cn("rounded-xl transition-all w-full p-3", isGenerating && "opacity-50 cursor-not-allowed")}
-            onClick={handleGenerate}
-            disabled={isGenerating}
-          >
-            {isGenerating ? "Generating..." : "Generate"}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="expandIcon"
+              className={cn("rounded-xl transition-all w-full p-3", isGenerating && "opacity-50 cursor-not-allowed")}
+              onClick={handleGenerate}
+              disabled={isGenerating}
+            >
+              {isGenerating ? "Generating..." : "Generate"}
+            </Button>
+
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              onClick={handleCleanStuckRuns}
+            >
+              🧹
+            </Button>
+          </div>
         </div>
       </Card>
     </div>

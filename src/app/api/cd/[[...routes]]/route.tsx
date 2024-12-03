@@ -23,66 +23,47 @@ async function handleRequest(request: NextRequest) {
   const apiPath = pathname.replace("/api/cd", "");
   const url = `https://api.comfydeploy.com/api${apiPath}${search}`;
 
-  console.log("[Proxy] Request URL:", url);
+  const headers = new Headers(request.headers);
+  headers.delete("host");
+  headers.set("Authorization", `Bearer ${process.env.COMFY_DEPLOY_API_KEY}`);
 
-  // Headers simplificados para la API
-  const headers = {
-    "Authorization": `Bearer ${process.env.COMFY_DEPLOY_API_KEY}`,
-    "Accept": "application/json",
-    "Content-Type": "application/json",
-  };
+  const response = await fetch(url, {
+    method: request.method,
+    headers,
+    body: request.body,
+  });
 
-  try {
-    const response = await fetch(url, {
-      method: request.method,
-      headers,
-      // Solo incluir body para métodos que no sean GET
-      ...(request.method !== "GET" && {
-        body: request.body
-      })
-    });
+  // Check if the response is streamable
+  const isStreamable = response.headers.get('Transfer-Encoding') === 'chunked' ||
+                      response.headers.get('Content-Type')?.includes('text/event-stream');
 
-    // Si la respuesta no es OK, intentar obtener el error detallado
-    if (!response.ok) {
-      let errorDetails;
-      try {
-        errorDetails = await response.json();
-      } catch {
-        errorDetails = await response.text();
+  if (isStreamable) {
+    // Create a TransformStream to handle the streaming response
+    const transformStream = new TransformStream();
+    const writer = transformStream.writable.getWriter();
+
+    // Start pumping the response body to the transform stream
+    response.body?.pipeTo(new WritableStream({
+      write(chunk) {
+        writer.write(chunk);
+      },
+      close() {
+        writer.close();
       }
+    }));
 
-      console.error("[Proxy] Error response:", {
-        status: response.status,
-        statusText: response.statusText,
-        details: errorDetails
-      });
-
-      return NextResponse.json({
-        error: "Error calling ComfyDeploy API",
-        status: response.status,
-        details: errorDetails
-      }, { status: response.status });
-    }
-
-    // Intentar devolver JSON si es posible
-    try {
-      const data = await response.json();
-      return NextResponse.json(data);
-    } catch {
-      // Si no es JSON, devolver el texto
-      const text = await response.text();
-      return new NextResponse(text, {
-        status: response.status,
-        headers: {
-          "Content-Type": "text/plain",
-        }
-      });
-    }
-  } catch (error) {
-    console.error("[Proxy] Error:", error);
-    return NextResponse.json({
-      error: "Internal server error",
-      details: error instanceof Error ? error.message : "Unknown error"
-    }, { status: 500 });
+    // Return a streaming response
+    return new NextResponse(transformStream.readable, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
+    });
   }
+
+  // For non-streaming responses, return as before
+  return new NextResponse(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
 }
