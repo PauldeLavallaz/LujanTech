@@ -1,38 +1,108 @@
-import { App } from "@/components/App";
+"use client";
+
+import { useUser } from "@clerk/nextjs";
+import { Card } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { MoreVertical, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Onboarding } from "@/components/Onboarding";
-import { UserRuns } from "@/components/UserRuns";
-import { Skeleton } from "@/components/ui/skeleton";
-import { getUserRuns } from "@/server/getUserRuns";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { Suspense } from "react";
-import { SWRConfig } from "swr";
+
+interface Flow {
+	id: string;
+	name: string;
+	lastImage?: string;
+	status: "success" | "running" | "error";
+	updatedAt: string;
+	author: string;
+}
+
+const flows: Flow[] = [
+	{
+		id: "basic",
+		name: "Comfy Platform",
+		lastImage: "/path/to/image.jpg", // Reemplazar con imágenes reales
+		status: "success",
+		updatedAt: "23 minutes ago",
+		author: "Paulde lavallaz"
+	},
+	{
+		id: "advanced",
+		name: "Karaoke",
+		lastImage: "/path/to/image2.jpg",
+		status: "success",
+		updatedAt: "an hour ago",
+		author: "Paulde lavallaz"
+	},
+	// ... más flujos
+];
 
 export default function Home() {
+	const { user, isSignedIn } = useUser();
+
+	if (!isSignedIn) {
+		return <Onboarding />;
+	}
+
 	return (
-		<main className="flex min-h-screen flex-col items-center">
-			<nav className="fixed z-50 top-0 left-0 right-0 py-2 px-4 flex items-center justify-between w-full border-b bg-background">
-				<div className="flex items-start justify-center">
-					<div className="font-bold text-sm sm:text-base md:text-lg">Morfeo Dreams Lab</div>
+		<div className="p-8">
+			{/* Header */}
+			<div className="flex justify-between items-center mb-8">
+				<div>
+					<h1 className="text-2xl font-bold">Flujos</h1>
+					<p className="text-gray-500">Gestiona tus flujos creativos</p>
 				</div>
-				<div className="flex items-center gap-2">
-					<SignedIn>
-						<UserButton />
-					</SignedIn>
-				</div>
-			</nav>
-			<div className="mt-[45px] w-full min-h-[calc(100vh-45px)] flex flex-col items-center">
-				<SignedOut>
-					<Onboarding />
-				</SignedOut>
-				<SignedIn>
-					<div className="w-full p-4 flex flex-col items-center justify-center gap-4">
-						<div className="max-w-[800px] w-full">
-							<UserRuns />
-						</div>
-						<App />
-					</div>
-				</SignedIn>
+				<Button>
+					<Plus className="w-4 h-4 mr-2" />
+					Nuevo Flujo
+				</Button>
 			</div>
-		</main>
+
+			{/* Grid */}
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+				{flows.map((flow) => (
+					<motion.div
+						key={flow.id}
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.3 }}
+					>
+						<Card className="overflow-hidden group cursor-pointer">
+							{/* Image */}
+							<div className="aspect-[4/3] relative">
+								{flow.lastImage ? (
+									<img
+										src={flow.lastImage}
+										alt={flow.name}
+										className="w-full h-full object-cover"
+									/>
+								) : (
+									<div className="w-full h-full bg-gray-100 flex items-center justify-center">
+										<Plus className="w-8 h-8 text-gray-400" />
+									</div>
+								)}
+								<Button
+									variant="ghost"
+									size="icon"
+									className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+								>
+									<MoreVertical className="w-4 h-4" />
+								</Button>
+							</div>
+
+							{/* Info */}
+							<div className="p-4">
+								<div className="flex items-center justify-between mb-2">
+									<h3 className="font-medium">{flow.name}</h3>
+									<div className={`w-2 h-2 rounded-full bg-${flow.status === 'success' ? 'green' : flow.status === 'running' ? 'blue' : 'red'}-500`} />
+								</div>
+								<div className="text-sm text-gray-500">
+									{flow.updatedAt} • {flow.author}
+								</div>
+							</div>
+						</Card>
+					</motion.div>
+				))}
+			</div>
+		</div>
 	);
 }

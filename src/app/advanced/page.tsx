@@ -1,0 +1,1 @@
+// Mover de src/app/generator/advanced/page.tsx a src/app/advanced/page.tsx 
