@@ -27,18 +27,19 @@ export function ImageGenerationResult({
 
         if (data.status) {
           switch (data.status) {
-            case "queued":
+            case "not-started":
               setStatus("queued");
               break;
-            case "processing":
-            case "started":
+            case "running":
               setStatus("processing");
               break;
-            case "completed":
-              setStatus("completed");
+            case "uploading":
+              setStatus("processing");
+              setProgress(0.95);
               break;
-            case "failed":
-              setStatus("error");
+            case "success":
+              setStatus("completed");
+              setProgress(1);
               break;
             default:
               setStatus(data.status);
@@ -49,11 +50,13 @@ export function ImageGenerationResult({
           setProgress(data.progress);
         }
 
-        const imageUrl = data.outputs?.[0]?.data?.images?.[0]?.url;
-        if (imageUrl) {
-          setImage(imageUrl);
-          setLoading(false);
-          return true;
+        if (data.status === "success" && data.outputs && data.outputs.length > 0) {
+          const imageUrl = data.outputs[0]?.data?.images?.[0]?.url;
+          if (imageUrl) {
+            setImage(imageUrl);
+            setLoading(false);
+            return true;
+          }
         }
         
         return false;
@@ -86,8 +89,6 @@ export function ImageGenerationResult({
       {!image && (
         <div className="absolute z-10 top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 px-4">
           <div className="flex items-center justify-center gap-2 text-gray-600">
-            {status === "optimizing_prompt" && "Optimizando prompt..."}
-            {status === "sending_to_comfy" && "Enviando a ComfyDeploy..."}
             {status === "queued" && "En cola..."}
             {status === "processing" && "Procesando..."}
             {status === "completed" && "¡Completado!"}
