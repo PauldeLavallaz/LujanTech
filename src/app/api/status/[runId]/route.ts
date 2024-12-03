@@ -5,10 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { runId: string } }
+  context: { params: { runId: string } }
 ) {
   try {
-    const runId = params.runId;
+    const runId = context.params.runId;
     
     const [run] = await db
       .select()
