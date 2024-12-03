@@ -3,7 +3,6 @@ import { runs } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm/expressions";
 
-
 export async function generateImage(
     prompt: string,
     endpoint: string,
@@ -31,14 +30,6 @@ export async function generateImage(
       inputs: inputsForDB,
     });
   
-    const inputsForAPI = {
-      prompt: prompt,
-      height,
-      width,
-      lora,
-      lora_strength: 0.1
-    };
-  
     try {
       const response = await fetch("https://api.comfydeploy.com/api/run/queue", {
         method: "POST",
@@ -48,8 +39,14 @@ export async function generateImage(
         },
         body: JSON.stringify({
           deployment_id: "e322689e-065a-4d33-aa6a-ee941803ca95",
-          inputs: inputsForAPI,
-          webhook: `${endpoint}/api/webhook`,
+          inputs: {
+            prompt,
+            height,
+            width,
+            lora,
+            lora_strength: 0.1
+          },
+          webhook: `${endpoint}/api/webhook`
         }),
       });
   
@@ -58,20 +55,31 @@ export async function generateImage(
       }
   
       const result = await response.json();
+      
+      console.log("ComfyDeploy API Response:", result);
+      
       if (result?.id) {
-        await db.update(runs).set({
-          live_status: "processing",
-        }).where(eq(runs.run_id, run_id));
+        await db.update(runs)
+          .set({
+            live_status: "processing",
+          })
+          .where(eq(runs.run_id, run_id));
+          
         return run_id;
       } else {
-        throw new Error("Image generation failed: Invalid response from ComfyDeploy");
+        console.error("Invalid response from ComfyDeploy:", result);
+        throw new Error("Invalid response from ComfyDeploy API");
       }
     } catch (error) {
       console.error("Error calling ComfyDeploy API:", error);
-      await db.update(runs).set({
-        live_status: "error",
-      }).where(eq(runs.run_id, run_id));
-      throw new Error("Error generating image");
+      
+      await db.update(runs)
+        .set({
+          live_status: "error",
+        })
+        .where(eq(runs.run_id, run_id));
+      
+      throw error;
     }
   }
   
