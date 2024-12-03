@@ -23,25 +23,40 @@ export function ImageGenerationResult({
         const response = await fetch(`/api/cd/run/${runId}`);
         const data = await response.json();
         
-        console.log("Status check response:", data); // Para debugging
+        console.log("Status check response:", data);
 
         if (data.status) {
-          setStatus(data.status);
+          switch (data.status) {
+            case "queued":
+              setStatus("queued");
+              break;
+            case "processing":
+            case "started":
+              setStatus("processing");
+              break;
+            case "completed":
+              setStatus("completed");
+              break;
+            case "failed":
+              setStatus("error");
+              break;
+            default:
+              setStatus(data.status);
+          }
         }
         
         if (typeof data.progress === 'number') {
           setProgress(data.progress);
         }
 
-        // Verificar si hay imagen disponible
         const imageUrl = data.outputs?.[0]?.data?.images?.[0]?.url;
         if (imageUrl) {
           setImage(imageUrl);
           setLoading(false);
-          return true; // Imagen encontrada
+          return true;
         }
         
-        return false; // Continuar polling
+        return false;
       } catch (error) {
         console.error("Error checking status:", error);
         return false;
@@ -71,6 +86,8 @@ export function ImageGenerationResult({
       {!image && (
         <div className="absolute z-10 top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 px-4">
           <div className="flex items-center justify-center gap-2 text-gray-600">
+            {status === "optimizing_prompt" && "Optimizando prompt..."}
+            {status === "sending_to_comfy" && "Enviando a ComfyDeploy..."}
             {status === "queued" && "En cola..."}
             {status === "processing" && "Procesando..."}
             {status === "completed" && "¡Completado!"}
