@@ -3,16 +3,13 @@ import { runs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
-type RouteContext = {
-  params: {
-    runId: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
+interface RouteParams {
+  runId: string;
+}
 
 export async function GET(
   request: NextRequest,
-  { params }: RouteContext
+  { params }: { params: RouteParams }
 ) {
   try {
     const runId = params.runId;
