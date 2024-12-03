@@ -9,12 +9,12 @@ import { ComfyDeployProvider } from "@/hooks/hooks";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-	title: "ComfyUI Nextjs Demo",
-	description: "A fullstack demo of ComfyUI with Nextjs, powered by ComfyDeploy",
-	keywords: ["nextjs", "comfyui", "comfydeploy", "fullstack", "demo"],
+	title: "Morfeo Dreams Lab",
+	description: "Desbloqueá el potencial creativo de tus ideas con IA",
+	keywords: ["ia", "creatividad", "diseño", "generativo", "comfyui", "arte"],
 	openGraph: {
-		title: "ComfyUI Nextjs Demo",
-		description: "A fullstack demo of ComfyUI with Nextjs, powered by ComfyDeploy",
+		title: "Morfeo Dreams Lab",
+		description: "Desbloqueá el potencial creativo de tus ideas con IA",
 	},
 };
 
@@ -24,8 +24,19 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<ClerkProvider>
-			<html lang="en">
+		<ClerkProvider
+			appearance={{
+				layout: {
+					socialButtonsPlacement: "bottom",
+					socialButtonsVariant: "blockButton",
+				},
+				variables: {
+					colorPrimary: "#000000",
+					borderRadius: "0.75rem",
+				},
+			}}
+		>
+			<html lang="es">
 				<body className={inter.className}>
 					<ComfyDeployProvider>
 						{children}
