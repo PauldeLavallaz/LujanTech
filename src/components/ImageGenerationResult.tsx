@@ -20,12 +20,15 @@ export function ImageGenerationResult({
 
     const checkStatus = async () => {
       try {
+        console.log("Checking status for runId:", runId);
         const response = await fetch(`/api/cd/run/${runId}`);
         const data = await response.json();
         
-        console.log("Status check response:", data);
+        console.log("Status check raw response:", response);
+        console.log("Status check data:", data);
 
         if (data.status) {
+          console.log("Current status:", data.status);
           switch (data.status) {
             case "not-started":
               setStatus("queued");
