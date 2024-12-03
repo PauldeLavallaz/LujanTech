@@ -44,7 +44,11 @@ export async function GET(request: NextRequest) {
     
     // Actualizar el estado en la base de datos
     if (comfyData.status !== run.live_status || comfyData.outputs?.[0]?.data?.images?.[0]?.url) {
-      const updates = {
+      const updates: {
+        live_status: string;
+        progress: number;
+        image_url?: string;
+      } = {
         live_status: comfyData.status,
         progress: comfyData.progress || 0,
       };
