@@ -94,116 +94,122 @@ export function App() {
   }, [runId]);
 
   return (
-    <div className="fixed z-50 bottom-0 md:bottom-2 flex flex-col gap-2 w-full md:max-w-lg mx-auto">
-      <Card className="p-2 shadow-lg rounded-none md:rounded-2xl">
-        <div className="flex flex-col gap-4">
+    <div className="fixed z-50 bottom-0 left-0 right-0 md:bottom-4 flex justify-center w-full px-4">
+      <Card className="w-full max-w-lg p-4 shadow-lg rounded-none md:rounded-2xl">
+        <div className="flex flex-col gap-3">
           {/* Prompt Input */}
           <Input
             id="input"
-            className="rounded-xl text-base sm:text-sm z-10"
+            className="rounded-xl text-sm"
             value={formData.prompt}
             onChange={(e) => handleSelection("prompt", e.target.value)}
             placeholder="Enter a prompt to generate an image"
           />
 
-          {/* Height & Width */}
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Dimensions:</label>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs text-gray-500">Width</label>
-                <Input
-                  type="number"
-                  min={512}
-                  max={2048}
-                  value={formData.width}
-                  onChange={(e) => handleSelection("width", Math.min(2048, Math.max(512, parseInt(e.target.value) || 512)))}
-                  className="mt-1"
-                />
+          {/* Dimensions & LoRA */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Left Column: Dimensions */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium">Dimensions</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Input
+                    type="number"
+                    min={512}
+                    max={2048}
+                    value={formData.width}
+                    onChange={(e) => handleSelection("width", Math.min(2048, Math.max(512, parseInt(e.target.value) || 512)))}
+                    className="h-8 text-xs"
+                  />
+                  <span className="text-[10px] text-gray-500">Width</span>
+                </div>
+                <div>
+                  <Input
+                    type="number"
+                    min={512}
+                    max={2048}
+                    value={formData.height}
+                    onChange={(e) => handleSelection("height", Math.min(2048, Math.max(512, parseInt(e.target.value) || 512)))}
+                    className="h-8 text-xs"
+                  />
+                  <span className="text-[10px] text-gray-500">Height</span>
+                </div>
               </div>
-              <div>
-                <label className="text-xs text-gray-500">Height</label>
-                <Input
-                  type="number"
-                  min={512}
-                  max={2048}
-                  value={formData.height}
-                  onChange={(e) => handleSelection("height", Math.min(2048, Math.max(512, parseInt(e.target.value) || 512)))}
-                  className="mt-1"
-                />
+
+              {/* Aspect Ratios */}
+              <div className="grid grid-cols-2 gap-1">
+                {[
+                  { height: 1152, width: 896, label: "896×1152" },
+                  { height: 896, width: 1152, label: "1152×896" },
+                  { height: 1024, width: 1024, label: "1024²" },
+                  { height: 768, width: 768, label: "768²" },
+                ].map((option) => (
+                  <Button
+                    key={option.label}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-6 text-xs rounded",
+                      formData.height === option.height && formData.width === option.width
+                        ? "bg-blue-500 text-white hover:bg-blue-600"
+                        : "hover:bg-gray-100"
+                    )}
+                    onClick={() => {
+                      handleSelection("height", option.height);
+                      handleSelection("width", option.width);
+                    }}
+                  >
+                    {option.label}
+                  </Button>
+                ))}
               </div>
             </div>
-            
-            {/* Dimensiones preestablecidas */}
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {[
-                { height: 1152, width: 896, label: "896x1152" },
-                { height: 896, width: 1152, label: "1152x896" },
-                { height: 1024, width: 1024, label: "1024x1024" },
-                { height: 768, width: 768, label: "768x768" },
-              ].map((option) => (
-                <Button
-                  key={option.label}
-                  className={cn(
-                    "rounded-md p-2 text-sm",
-                    formData.height === option.height && formData.width === option.width
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200"
-                  )}
-                  onClick={() => {
-                    handleSelection("height", option.height);
-                    handleSelection("width", option.width);
-                  }}
-                >
-                  {option.label}
-                </Button>
-              ))}
+
+            {/* Right Column: LoRA */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium">LoRA Settings</label>
+              <select
+                value={formData.lora}
+                onChange={(e) => handleSelection("lora", e.target.value)}
+                className="w-full h-8 text-xs border rounded px-2"
+              >
+                <option value="">Sin LoRA</option>
+                <option value="flux-RealismLora.safetensors">Realism LoRA</option>
+              </select>
+
+              {formData.lora && (
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-gray-500">Strength</span>
+                    <span className="text-[10px] text-gray-500">{formData.lora_strength}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={formData.lora_strength}
+                    onChange={(e) => handleSelection("lora_strength", parseFloat(e.target.value))}
+                    className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                </div>
+              )}
             </div>
-          </div>
-
-          {/* LoRA Dropdown y Strength */}
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">LoRA:</label>
-            <select
-              value={formData.lora}
-              onChange={(e) => handleSelection("lora", e.target.value)}
-              className="w-full border rounded-md p-2"
-            >
-              <option value="">Sin LoRA</option>
-              <option value="flux-RealismLora.safetensors">Realism LoRA</option>
-            </select>
-
-            {formData.lora && (
-              <div className="mt-2">
-                <label className="text-sm text-gray-500">
-                  LoRA Strength: {formData.lora_strength}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.1"
-                  value={formData.lora_strength}
-                  onChange={(e) => handleSelection("lora_strength", parseFloat(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-              </div>
-            )}
           </div>
 
           {/* Generate Button */}
           <div className="flex gap-2">
             <Button
-              variant="expandIcon"
-              className={cn("rounded-xl transition-all w-full p-3", isGenerating && "opacity-50 cursor-not-allowed")}
+              variant="default"
+              className={cn("w-full rounded-xl py-2", isGenerating && "opacity-50 cursor-not-allowed")}
               onClick={handleGenerate}
               disabled={isGenerating}
             >
               {isGenerating ? "Generating..." : "Generate"}
             </Button>
-
             <Button
               variant="outline"
+              size="icon"
               className="rounded-xl"
               onClick={handleCleanStuckRuns}
             >
