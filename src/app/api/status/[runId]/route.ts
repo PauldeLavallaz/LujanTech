@@ -3,13 +3,16 @@ import { runs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  context: { params: { runId: string } }
-) {
+export const runtime = "edge";
+
+export async function GET(request: NextRequest) {
   try {
-    const { runId } = context.params;
+    const runId = request.nextUrl.pathname.split('/').pop();
     
+    if (!runId) {
+      return NextResponse.json({ error: "Run ID is required" }, { status: 400 });
+    }
+
     const [run] = await db
       .select()
       .from(runs)
