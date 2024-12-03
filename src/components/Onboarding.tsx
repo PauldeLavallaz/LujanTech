@@ -1,6 +1,6 @@
 "use client";
 
-import { SignInButton } from "@clerk/nextjs";
+import { SignInButton, useSignIn } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { ArrowRight, Sparkles, Palette, Zap, Layers } from "lucide-react";
 import Image from "next/image";
@@ -21,6 +21,12 @@ const stagger = {
 };
 
 export function Onboarding() {
+	const { signIn } = useSignIn();
+
+	const handleSignIn = () => {
+		signIn?.redirectToSignIn({ redirectUrl: "/" });
+	};
+
 	return (
 		<div className="flex flex-col w-full">
 			{/* Hero Section */}
@@ -57,12 +63,14 @@ export function Onboarding() {
 						Desbloqueá el potencial creativo de tus ideas
 					</motion.p>
 					<motion.div variants={fadeIn}>
-						<SignInButton mode="modal" redirectUrl="/">
-							<Button size="lg" className="rounded-full px-8 py-6 bg-black hover:bg-black/90">
-								Empezá a crear
-								<ArrowRight className="ml-2" />
-							</Button>
-						</SignInButton>
+						<Button 
+							size="lg" 
+							className="rounded-full px-8 py-6 bg-black hover:bg-black/90"
+							onClick={handleSignIn}
+						>
+							Empezá a crear
+							<ArrowRight className="ml-2" />
+						</Button>
 					</motion.div>
 				</div>
 			</motion.section>
@@ -146,12 +154,14 @@ export function Onboarding() {
 					<p className="text-xl mb-12 text-gray-300 max-w-2xl mx-auto">
 						Morfeo Dreams Lab es una interfaz diseñada para que trabajes con los flujos creativos más complejos de ComfyUI sin complicaciones
 					</p>
-					<SignInButton mode="modal" redirectUrl="/">
-						<Button size="lg" className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100">
-							Comenzá ahora
-							<ArrowRight className="ml-2" />
-						</Button>
-					</SignInButton>
+					<Button 
+						size="lg" 
+						className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100"
+						onClick={handleSignIn}
+					>
+						Comenzá ahora
+						<ArrowRight className="ml-2" />
+					</Button>
 				</motion.div>
 			</section>
 		</div>
