@@ -17,7 +17,7 @@ export function UserRuns() {
 	if (userRuns && userRuns.length > 0) {
 		return (
 			<>
-				<div className="max-w-[800px] w-full grid grid-cols-2 md:gap-4 pb-32">
+				<div className="max-w-full w-full grid grid-cols-1 md:grid-cols-2 gap-4 pb-[200px] md:pb-[150px]">
 					{userRuns.map((run) => (
 						<div
 							className="md:rounded-sm overflow-hidden relative group cursor-pointer"
