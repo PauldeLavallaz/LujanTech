@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { ArrowRight, Sparkles, Palette, Zap, Layers } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { ParticlesBackground } from "./ParticlesBackground";
 
 const fadeIn = {
 	initial: { opacity: 0, y: 20 },
@@ -31,34 +32,26 @@ export function Onboarding() {
 				variants={stagger}
 			>
 				{/* Hero Background */}
-				<div className="absolute inset-0 z-0">
-					<Image
-						src="/images/hero-bg.jpg"
-						alt="Hero background"
-						fill
-						className="object-cover brightness-[0.85]"
-						priority
-						quality={100}
-					/>
-					<div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent" />
+				<div className="absolute inset-0 z-0 bg-gradient-to-b from-gray-900 to-black">
+					<ParticlesBackground />
 				</div>
 				
 				<div className="relative z-10 container mx-auto px-4 text-center">
 					<motion.h1 
-						className="text-4xl md:text-7xl font-bold mb-6 text-white"
-						variants={fadeIn}
+							className="text-4xl md:text-7xl font-bold mb-6 text-white"
+							variants={fadeIn}
 					>
 						Creatividad sin límites
 					</motion.h1>
 					<motion.p 
-						className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-200"
-						variants={fadeIn}
+							className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-200"
+							variants={fadeIn}
 					>
 						Desbloqueá el potencial creativo de tus ideas
 					</motion.p>
 					<motion.div variants={fadeIn} className="relative z-50">
 						<SignInButton mode="modal">
-							<Button size="lg" className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100">
+							<Button size="lg" className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100 pointer-events-auto">
 								Empezá a crear
 								<ArrowRight className="ml-2" />
 							</Button>
@@ -93,7 +86,7 @@ export function Onboarding() {
 						Morfeo Dreams Lab es una interfaz diseñada para que trabajes con los flujos creativos más complejos de ComfyUI sin complicaciones
 					</p>
 					<SignInButton mode="modal">
-						<Button size="lg" className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100">
+						<Button size="lg" className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100 pointer-events-auto">
 							Comenzá ahora
 							<ArrowRight className="ml-2" />
 						</Button>
