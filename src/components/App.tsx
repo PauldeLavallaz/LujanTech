@@ -94,8 +94,34 @@ export function App() {
 
           {/* Height & Width */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Height & Width:</label>
-            <div className="grid grid-cols-2 gap-2">
+            <label className="text-sm font-medium">Dimensions:</label>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs text-gray-500">Width</label>
+                <Input
+                  type="number"
+                  min={512}
+                  max={2048}
+                  value={formData.width}
+                  onChange={(e) => handleSelection("width", Math.min(2048, Math.max(512, parseInt(e.target.value) || 512)))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500">Height</label>
+                <Input
+                  type="number"
+                  min={512}
+                  max={2048}
+                  value={formData.height}
+                  onChange={(e) => handleSelection("height", Math.min(2048, Math.max(512, parseInt(e.target.value) || 512)))}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            
+            {/* Dimensiones preestablecidas */}
+            <div className="grid grid-cols-2 gap-2 mt-2">
               {[
                 { height: 1152, width: 896, label: "896x1152" },
                 { height: 896, width: 1152, label: "1152x896" },
@@ -105,7 +131,7 @@ export function App() {
                 <Button
                   key={option.label}
                   className={cn(
-                    "rounded-md p-2",
+                    "rounded-md p-2 text-sm",
                     formData.height === option.height && formData.width === option.width
                       ? "bg-blue-500 text-white"
                       : "bg-gray-200"
@@ -121,7 +147,7 @@ export function App() {
             </div>
           </div>
 
-          {/* LoRA Dropdown */}
+          {/* LoRA Dropdown y Strength */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">LoRA:</label>
             <select
@@ -129,11 +155,26 @@ export function App() {
               onChange={(e) => handleSelection("lora", e.target.value)}
               className="w-full border rounded-md p-2"
             >
-              <option value="">Select LoRA</option>
-              <option value="lora1">LoRA 1</option>
-              <option value="lora2">LoRA 2</option>
-              <option value="lora3">LoRA 3</option>
+              <option value="">Sin LoRA</option>
+              <option value="flux-RealismLora.safetensors">Realism LoRA</option>
             </select>
+
+            {formData.lora && (
+              <div className="mt-2">
+                <label className="text-sm text-gray-500">
+                  LoRA Strength: {formData.lora_strength}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={formData.lora_strength}
+                  onChange={(e) => handleSelection("lora_strength", parseFloat(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+            )}
           </div>
 
           {/* Generate Button */}
