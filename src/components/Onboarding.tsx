@@ -6,6 +6,12 @@ import { ArrowRight, Sparkles, Palette, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { ParticlesBackground } from "./ParticlesBackground";
 
+const fadeIn = {
+	initial: { opacity: 0, y: 20 },
+	animate: { opacity: 1, y: 0 },
+	transition: { duration: 0.5 }
+};
+
 export function Onboarding() {
 	return (
 		<div className="flex flex-col w-full">
@@ -22,32 +28,18 @@ export function Onboarding() {
 				
 				{/* Content */}
 				<div className="relative z-10 container mx-auto px-4 text-center">
-					<motion.h1 
-						className="text-4xl md:text-7xl font-bold mb-6 text-white"
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.5 }}
-					>
+					<h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
 						Creatividad sin límites
-					</motion.h1>
-					<motion.p 
-						className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-200"
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.5, delay: 0.2 }}
-					>
+					</h1>
+					<p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-200">
 						Desbloqueá el potencial creativo de tus ideas
-					</motion.p>
+					</p>
 					<motion.div 
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.5, delay: 0.4 }}
+						variants={fadeIn}
+						className="relative z-50"
 					>
-						<SignInButton>
-							<Button 
-								size="lg" 
-								className="rounded-full px-8 py-6 bg-white text-black hover:bg-gray-100"
-							>
+						<SignInButton mode="modal">
+							<Button size="lg" className="rounded-full">
 								Empezá a crear
 								<ArrowRight className="ml-2" />
 							</Button>
