@@ -38,10 +38,10 @@ export function Onboarding() {
 						variants={fadeIn}
 						className="relative z-50"
 					>
-						<SignInButton mode="modal" afterSignInUrl="/">
+						<SignInButton mode="modal">
 							<Button size="lg" className="rounded-full bg-white text-black hover:bg-gray-100">
-									Empezá a crear
-									<ArrowRight className="ml-2" />
+								Empezá a crear
+								<ArrowRight className="ml-2" />
 							</Button>
 						</SignInButton>
 					</motion.div>

@@ -6,8 +6,8 @@ export default function Page() {
       <SignIn 
         path="/sign-in"
         routing="path"
-        redirectUrl="https://www.morfeolabs.com"
-        afterSignInUrl="https://www.morfeolabs.com"
+        signInForceRedirectUrl="https://www.morfeolabs.com"
+        signUpForceRedirectUrl="https://www.morfeolabs.com"
         appearance={{
           elements: {
             rootBox: "mx-auto",
@@ -37,7 +37,6 @@ export default function Page() {
             socialButtonsPlacement: "bottom"
           }
         }}
-        signUpUrl="/sign-up"
       />
     </div>
   );
