@@ -20,12 +20,21 @@ export function ImageGenerationResult({
 
     const checkStatus = async () => {
       try {
-        console.log("Checking status for runId:", runId);
+        console.log("[Status Check] Checking runId:", runId);
         const response = await fetch(`/api/cd/run/${runId}`);
-        const data = await response.json();
         
-        console.log("Status check raw response:", response);
-        console.log("Status check data:", data);
+        if (!response.ok) {
+          console.error("[Status Check] Error response:", {
+            status: response.status,
+            statusText: response.statusText
+          });
+          const errorText = await response.text();
+          console.error("[Status Check] Error body:", errorText);
+          return false;
+        }
+
+        const data = await response.json();
+        console.log("[Status Check] Response data:", data);
 
         if (data.status) {
           console.log("Current status:", data.status);
@@ -64,7 +73,7 @@ export function ImageGenerationResult({
         
         return false;
       } catch (error) {
-        console.error("Error checking status:", error);
+        console.error("[Status Check] Error:", error);
         return false;
       }
     };
