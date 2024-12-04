@@ -13,7 +13,7 @@ import Link from "next/link";
 interface Flow {
 	id: string;
 	name: string;
-	lastImage?: string;
+	lastImage: string | null;
 	status: "success" | "running" | "error";
 	path: string;
 }
@@ -27,14 +27,14 @@ export default function Home() {
 		{
 			id: "basic",
 			name: "Generador Básico",
-			lastImage: userRuns?.[0]?.image_url,
+			lastImage: userRuns?.[0]?.image_url || null,
 			status: "success",
 			path: "/basic"
 		},
 		{
 			id: "advanced",
 			name: "Generador Avanzado",
-			lastImage: userRuns?.[1]?.image_url,
+			lastImage: userRuns?.[1]?.image_url || null,
 			status: "success",
 			path: "/advanced"
 		}
