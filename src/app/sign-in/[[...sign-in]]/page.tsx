@@ -6,8 +6,8 @@ export default function Page() {
       <SignIn 
         path="/sign-in"
         routing="path"
-        redirectUrl="/dashboard"
-        afterSignUpUrl="/dashboard"
+        redirectUrl="/"
+        afterSignUpUrl="/"
         appearance={{
           elements: {
             rootBox: "mx-auto",
