@@ -10,9 +10,10 @@ interface ImageGenerationResultProps {
   runId: string;
   className?: string;
   onImageLoad?: (imageUrl: string) => void;
+  onClick?: () => void;
 }
 
-export function ImageGenerationResult({ runId, className, onImageLoad }: ImageGenerationResultProps) {
+export function ImageGenerationResult({ runId, className, onImageLoad, onClick }: ImageGenerationResultProps) {
   const [image, setImage] = useState("");
   const [status, setStatus] = useState<string>("queued");
   const [progress, setProgress] = useState<number>(0);
@@ -64,6 +65,7 @@ export function ImageGenerationResult({ runId, className, onImageLoad }: ImageGe
         "border border-gray-200 w-full aspect-[512/512] relative",
         className
       )}
+      onClick={onClick}
     >
       {!loading && image && (
         <img className="w-full h-full object-cover" src={image} alt="Generated image" />

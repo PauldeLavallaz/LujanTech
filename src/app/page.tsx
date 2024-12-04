@@ -5,7 +5,7 @@ import { Onboarding } from "@/components/Onboarding";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Wand2, Stars } from "lucide-react";
+import { ArrowRight, Sparkles, CreditCard, Stars } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const dreamMachines = [
@@ -19,13 +19,13 @@ const dreamMachines = [
     features: ["Prompts en español", "Selección de Loras", "Ajustes de tamaño"]
   },
   {
-    id: "advanced-generator",
-    name: "Generador Avanzado",
-    description: "Control total sobre el proceso creativo con opciones avanzadas de generación.",
-    icon: <Wand2 className="w-8 h-8" />,
-    path: "/generator/advanced",
+    id: "franatics",
+    name: "Franatics",
+    description: "¿Sos un verdadero fan de Franui? Generá tu credencial de Franatic",
+    icon: <CreditCard className="w-8 h-8" />,
+    path: "/generator/franatics",
     status: "beta",
-    features: ["Todas las funciones básicas", "Control de parámetros", "Modos especiales"]
+    features: ["Cargá tu selfie", "Completá tus datos", "Elegí tu Franui favorito"]
   }
 ];
 
