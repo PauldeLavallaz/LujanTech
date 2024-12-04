@@ -22,13 +22,8 @@ export default function FranaticsGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerate = async () => {
-    if (!formData.img_face) {
-      toast.error("Por favor cargá una selfie");
-      return;
-    }
-
-    if (!formData.txt_nombre || !formData.txt_nacionalidad) {
-      toast.error("Por favor completá todos los datos");
+    if (!formData.img_face || !formData.txt_nombre || !formData.txt_nacionalidad) {
+      toast.error("Por favor completa todos los campos requeridos");
       return;
     }
 
@@ -38,17 +33,30 @@ export default function FranaticsGenerator() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
-          deploymentId: "cec337bf-69d6-4886-97b0-acbeba47f1ec"
+          deploymentId: "cec337bf-69d6-4886-97b0-acbeba47f1ec",
+          webhook: window.location.origin + "/api/webhook",
+          inputs: {
+            img_face: formData.img_face,
+            txt_nacionalidad: formData.txt_nacionalidad,
+            txt_nombre: formData.txt_nombre,
+            num: formData.num,
+            variedad: formData.variedad,
+            img_man: "",
+            img_woman: "",
+            depth_man: "",
+            depth_woman: "",
+            canny_man: "",
+            canny_woman: ""
+          }
         }),
       });
 
       const result = await response.json();
       if (response.ok && result.run_id) {
-        toast.success("¡Generación iniciada!");
+        toast.success("¡Generación de credencial iniciada!");
         mutate("userRuns");
       } else {
-        toast.error("Error al generar la credencial");
+        toast.error(result.error || "Error al generar la credencial");
       }
     } catch (error) {
       console.error("Error:", error);
