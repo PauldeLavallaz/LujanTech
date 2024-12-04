@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic';
 
 // Dynamically import ParticlesBackground with no SSR
 const ParticlesBackground = dynamic(
-	() => import('./ParticlesBackground').then(mod => mod.ParticlesBackground),
+	() => import('./ParticlesBackground'),
 	{ ssr: false }
 );
 
