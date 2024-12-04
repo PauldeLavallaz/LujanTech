@@ -21,17 +21,20 @@ export async function POST(request: NextRequest) {
 
     // Si es el generador básico
     if (deploymentId === "e322689e-065a-4d33-aa6a-ee941803ca95") {
-      if (!prompt || !height || !width) {
+      if (!inputs?.prompt || !inputs?.height || !inputs?.width) {
         return NextResponse.json(
           { error: "Faltan campos requeridos: prompt, height, width" },
           { status: 400 }
         );
       }
 
-      const run_id = await generateImage(prompt, endpoint, {
+      const run_id = await generateImage("", endpoint, {
         ...body,
-        height: parseInt(height.toString(), 10),
-        width: parseInt(width.toString(), 10),
+        inputs: {
+          prompt: inputs.prompt,
+          height: parseInt(inputs.height.toString(), 10),
+          width: parseInt(inputs.width.toString(), 10)
+        }
       });
 
       return NextResponse.json({ run_id }, { status: 200 });

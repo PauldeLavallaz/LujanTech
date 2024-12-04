@@ -8,14 +8,12 @@ import { ParticlesBackground } from "./ParticlesBackground";
 
 export function Onboarding() {
 	return (
-		<div className="w-full h-screen flex items-center justify-center bg-black overflow-hidden">
+		<main className="fixed inset-0 bg-black">
 			{/* Background con partículas */}
-			<div className="absolute inset-0">
-				<ParticlesBackground />
-			</div>
+			<ParticlesBackground />
 
 			{/* Contenido */}
-			<div className="relative z-10 w-full">
+			<div className="relative z-10 flex items-center justify-center h-full">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -44,6 +42,6 @@ export function Onboarding() {
 					</SignInButton>
 				</motion.div>
 			</div>
-		</div>
+		</main>
 	);
 }

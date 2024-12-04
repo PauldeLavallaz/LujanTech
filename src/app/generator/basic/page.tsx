@@ -25,24 +25,21 @@ export default function BasicGenerator() {
 
     setIsGenerating(true);
     try {
-      console.log("Sending generation request:", {
-        ...formData,
-        deploymentId: "e322689e-065a-4d33-aa6a-ee941803ca95"
-      });
-
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
           deploymentId: "e322689e-065a-4d33-aa6a-ee941803ca95",
-          webhook: window.location.origin + "/api/webhook"
+          webhook: window.location.origin + "/api/webhook",
+          inputs: {
+            prompt: formData.prompt,
+            height: formData.height,
+            width: formData.width
+          }
         }),
       });
 
       const result = await response.json();
-      console.log("Generation response:", result);
-
       if (response.ok && result.run_id) {
         toast.success("¡Generación de imagen iniciada!");
         mutate("userRuns");
@@ -99,7 +96,7 @@ export default function BasicGenerator() {
 
   return (
     <GeneratorLayout inputs={inputs}>
-      <UserRuns deploymentId="basic-workflow" />
+      <UserRuns deploymentId="e322689e-065a-4d33-aa6a-ee941803ca95" />
     </GeneratorLayout>
   );
 } 

@@ -105,9 +105,9 @@ export default function FranaticsGenerator() {
             <SelectValue placeholder="Elegí tu variedad favorita" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Milk">Milk Chocolate</SelectItem>
-            <SelectItem value="Dark">Dark Chocolate</SelectItem>
-            <SelectItem value="Pink">Pink Chocolate</SelectItem>
+            <SelectItem value="Milk">Milk</SelectItem>
+            <SelectItem value="Dark">Dark</SelectItem>
+            <SelectItem value="Pink">Pink</SelectItem>
           </SelectContent>
         </Select>
       </div>

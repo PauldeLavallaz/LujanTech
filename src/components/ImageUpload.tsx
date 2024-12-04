@@ -19,16 +19,36 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
 
     setLoading(true);
     try {
-      // Aquí iría la lógica para subir la imagen a tu servidor/storage
-      // Por ahora, convertimos a base64 como ejemplo
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onChange(reader.result as string);
-        setLoading(false);
-      };
-      reader.readAsDataURL(file);
+      // Primero, convertimos a base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      // Ahora subimos la imagen a un servidor temporal
+      const response = await fetch("/api/file/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          file: base64,
+          filename: file.name 
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al subir la imagen");
+      }
+
+      const data = await response.json();
+      onChange(data.file_url); // Usamos la URL devuelta por el servidor
     } catch (error) {
+      console.error("Error:", error);
       toast.error("Error al cargar la imagen");
+    } finally {
       setLoading(false);
     }
   }, [onChange]);
@@ -51,8 +71,14 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
         <img src={value} alt="Uploaded" className="w-full h-48 object-cover rounded-lg" />
       ) : (
         <div className="h-48 flex flex-col items-center justify-center gap-2 text-gray-500">
-          <Upload className="w-8 h-8" />
-          <p className="text-sm">Arrastrá o hacé click para subir tu selfie</p>
+          {loading ? (
+            <div className="animate-pulse">Subiendo imagen...</div>
+          ) : (
+            <>
+              <Upload className="w-8 h-8" />
+              <p className="text-sm">Arrastrá o hacé click para subir tu selfie</p>
+            </>
+          )}
         </div>
       )}
     </div>
