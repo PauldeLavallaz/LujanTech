@@ -1,57 +1,47 @@
 "use client";
 
-import useSWR from "swr";
 import { getUserRuns } from "@/server/getUserRuns";
-import React, { useState } from "react";
+import useSWR from "swr";
 import { ImageGenerationResult } from "./ImageGenerationResult";
-import { Sparkle } from "lucide-react";
+import { ScrollArea } from "./ui/scroll-area";
 import { ImageModal } from "./ImageModal";
+import { useState } from "react";
 
 export function UserRuns() {
-	const { data: userRuns, isValidating } = useSWR("userRuns", getUserRuns, {
-			refreshInterval: 5000,
+	const { data: userRuns } = useSWR("userRuns", getUserRuns, {
+		refreshInterval: 5000 // Actualizar cada 5 segundos para ver nuevas imágenes
 	});
-
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-	if (userRuns && userRuns.length > 0) {
-		return (
-			<>
-				<div className="max-w-full w-full grid grid-cols-1 md:grid-cols-2 gap-4 pb-[200px] md:pb-[150px]">
-					{userRuns.map((run) => (
-						<div
-							className="md:rounded-sm overflow-hidden relative group cursor-pointer"
-							key={run.run_id}
-							onClick={() => run.image_url && setSelectedImage(run.image_url)}
+	return (
+		<div className="w-full">
+			<ScrollArea className="h-full">
+				<div className="grid grid-cols-2 gap-4">
+					{userRuns?.map((run) => (
+						<div 
+							key={run.run_id} 
+							onClick={() => run.image_url && setSelectedImage(run.image_url)} 
+							className="cursor-pointer"
 						>
-							{!run.image_url && <ImageGenerationResult runId={run.run_id} />}
-							{run.image_url && <img src={run.image_url} alt="Run" className="w-full h-full object-cover" />}
-							{run.inputs && (
-								<div className="transition-opacity group-hover:opacity-100 opacity-0 absolute bottom-0 text-xs text-white/80 p-4 bg-slate-950/40 flex flex-col gap-2">
-									{Object.entries(run.inputs).map(([key, value]) => (
-										<div key={key}>
-											<span className="font-bold">{key}:</span>{" "}
-											<span>{value}</span>
-										</div>
-									))}
-								</div>
-							)}
+							<ImageGenerationResult
+								imageUrl={run.image_url}
+								prompt={run.inputs?.prompt}
+								height={run.inputs?.height}
+								width={run.inputs?.width}
+								lora={run.inputs?.lora}
+								lora_strength={run.inputs?.lora_strength}
+							/>
 						</div>
 					))}
 				</div>
-				{selectedImage && (
-					<ImageModal 
-						imageUrl={selectedImage} 
-						onClose={() => setSelectedImage(null)} 
-					/>
-				)}
-			</>
-		);
-	}
+			</ScrollArea>
 
-	return (
-		<div className="text-sm flex w-full h-[calc(100vh-45px-50px)] justify-center items-center text-gray-400 gap-2">
-			Start generating some images! <Sparkle size={16} />
+			{selectedImage && (
+				<ImageModal
+					imageUrl={selectedImage}
+					onClose={() => setSelectedImage(null)}
+				/>
+			)}
 		</div>
 	);
 }
