@@ -4,7 +4,13 @@ import { SignInButton } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { ArrowRight, Sparkles, Palette, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import { ParticlesBackground } from "./ParticlesBackground";
+import dynamic from 'next/dynamic';
+
+// Dynamically import ParticlesBackground with no SSR
+const ParticlesBackground = dynamic(
+	() => import('./ParticlesBackground').then(mod => mod.ParticlesBackground),
+	{ ssr: false }
+);
 
 const fadeIn = {
 	initial: { opacity: 0, y: 20 },
