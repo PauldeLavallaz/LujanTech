@@ -11,15 +11,15 @@ import {
 
 const sidebarItems = [
   {
-    title: "Aplicación",
+    title: "APLICACIÓN",
     items: [
-      { name: "Flujos", icon: <Workflow className="w-4 h-4" />, href: "/dashboard" },
+      { name: "Flujos", icon: <Workflow className="w-4 h-4" />, href: "/" },
       { name: "Historial", icon: <BarChart className="w-4 h-4" />, href: "/history" },
       { name: "Explorar", icon: <LayoutGrid className="w-4 h-4" />, href: "/explore" },
     ]
   },
   {
-    title: "Cuenta",
+    title: "CUENTA",
     items: [
       { name: "Configuración", icon: <Settings className="w-4 h-4" />, href: "/settings" },
       { name: "API Keys", icon: <KeyRound className="w-4 h-4" />, href: "/api-keys" },
@@ -34,7 +34,7 @@ export function Sidebar() {
       <div className="h-full flex flex-col">
         {/* Logo */}
         <div className="p-4 border-b">
-          <Link href="/dashboard" className="text-xl font-bold">
+          <Link href="/" className="text-xl font-bold">
             Morfeo Dreams Lab
           </Link>
         </div>
