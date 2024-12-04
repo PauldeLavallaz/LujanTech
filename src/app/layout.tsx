@@ -6,8 +6,11 @@ import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
 import { usePathname } from "next/navigation";
 import { Toaster } from "@/components/ui/sonner";
+import { useUser } from "@clerk/nextjs";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const publicRoutes = ["/", "/sign-in", "/sign-up"];
 
 export default function RootLayout({
 	children,
@@ -16,12 +19,13 @@ export default function RootLayout({
 }) {
 	function LayoutContent({ children }: { children: React.ReactNode }) {
 		const pathname = usePathname();
-		const isPublicRoute = pathname === "/" || pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
+		const { isSignedIn } = useUser();
+		const isPublicRoute = publicRoutes.includes(pathname);
 
 		return (
 			<div className="flex h-screen">
-				{!isPublicRoute && <Sidebar />}
-				<main className={`flex-1 ${!isPublicRoute ? 'bg-gray-50' : ''}`}>
+				{isSignedIn && !isPublicRoute && <Sidebar />}
+				<main className={`flex-1 ${isSignedIn && !isPublicRoute ? 'bg-gray-50' : ''}`}>
 					{children}
 				</main>
 			</div>
