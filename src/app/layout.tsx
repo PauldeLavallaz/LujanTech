@@ -25,7 +25,7 @@ export default function RootLayout({
 		return (
 			<div className="flex h-screen">
 				{isSignedIn && !isPublicRoute && <Sidebar />}
-				<main className={`flex-1 ${isSignedIn && !isPublicRoute ? 'bg-gray-50' : ''}`}>
+				<main className="flex-1">
 					{children}
 				</main>
 			</div>
