@@ -9,7 +9,7 @@ import { useState } from "react";
 
 export function UserRuns() {
 	const { data: userRuns } = useSWR("userRuns", getUserRuns, {
-		refreshInterval: 5000 // Actualizar cada 5 segundos para ver nuevas imágenes
+		refreshInterval: 5000
 	});
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -23,14 +23,7 @@ export function UserRuns() {
 							onClick={() => run.image_url && setSelectedImage(run.image_url)} 
 							className="cursor-pointer"
 						>
-							<ImageGenerationResult
-								imageUrl={run.image_url}
-								prompt={run.inputs?.prompt}
-								height={run.inputs?.height}
-								width={run.inputs?.width}
-								lora={run.inputs?.lora}
-								lora_strength={run.inputs?.lora_strength}
-							/>
+							<ImageGenerationResult runId={run.run_id} />
 						</div>
 					))}
 				</div>

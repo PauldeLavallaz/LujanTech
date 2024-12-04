@@ -23,9 +23,9 @@ export default function RootLayout({
 		const isPublicRoute = publicRoutes.includes(pathname);
 
 		return (
-			<div className="flex h-screen">
+			<div className="flex min-h-screen">
 				{isSignedIn && !isPublicRoute && <Sidebar />}
-				<main className="flex-1">
+				<main className={`flex-1 ${isSignedIn && !isPublicRoute ? 'ml-64' : ''}`}>
 					<div className="max-w-7xl mx-auto px-4 py-8">
 						{children}
 					</div>
