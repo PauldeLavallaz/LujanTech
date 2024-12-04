@@ -28,28 +28,20 @@ export default function BasicGenerator() {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          deploymentId: "e322689e-065a-4d33-aa6a-ee941803ca95",
-          webhook: window.location.origin + "/api/webhook",
-          inputs: {
-            prompt: formData.prompt,
-            height: formData.height,
-            width: formData.width
-          }
-        }),
+        body: JSON.stringify(formData),
       });
 
       const result = await response.json();
       if (response.ok && result.run_id) {
-        toast.success("¡Generación de imagen iniciada!");
+        toast.success("¡Generación iniciada!");
         mutate("userRuns");
       } else {
         console.error("Generation failed:", result);
-        toast.error(result.error || "Fallo al iniciar la generación de imagen.");
+        toast.error(result.error || "Error al generar la imagen");
       }
     } catch (error) {
-      console.error("Error generando imagen:", error);
-      toast.error("Ocurrió un error al generar la imagen.");
+      console.error("Error:", error);
+      toast.error("Error al generar la imagen");
     } finally {
       setIsGenerating(false);
     }

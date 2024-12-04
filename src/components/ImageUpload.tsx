@@ -19,29 +19,43 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
 
     setLoading(true);
     try {
-      // Crear FormData con el archivo
-      const formData = new FormData();
-      formData.append('file', file);
+      // Convertir a base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          // Extraer solo la parte de datos del base64
+          const base64Data = result.split(',')[1];
+          resolve(base64Data);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
-      // Subir directamente a ComfyDeploy
+      // Subir a ComfyDeploy
       const response = await fetch("https://api.comfydeploy.com/api/file/upload", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_COMFY_DEPLOY_API_KEY}`
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_COMFY_DEPLOY_API_KEY}`,
+          "Content-Type": "application/json"
         },
-        body: formData
+        body: JSON.stringify({
+          file: base64,
+          filename: file.name
+        })
       });
 
       if (!response.ok) {
         const error = await response.json();
+        console.error("Error response:", error);
         throw new Error(error.message || "Error al subir la imagen");
       }
 
       const data = await response.json();
-      console.log("Upload response:", data); // Para debug
-      
-      if (data.file_url) {
-        onChange(data.file_url);
+      console.log("Upload response:", data);
+
+      if (data.url) {
+        onChange(data.url);
       } else {
         throw new Error("No se recibió la URL de la imagen");
       }
@@ -59,7 +73,8 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       'image/*': ['.png', '.jpg', '.jpeg']
     },
     maxFiles: 1,
-    multiple: false
+    multiple: false,
+    maxSize: 5 * 1024 * 1024 // 5MB máximo
   });
 
   return (
@@ -93,6 +108,9 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                   "Soltá la imagen aquí" : 
                   "Arrastrá o hacé click para subir tu selfie"
                 }
+              </p>
+              <p className="text-xs text-gray-400">
+                Máximo 5MB
               </p>
             </>
           )}

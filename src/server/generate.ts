@@ -1,52 +1,55 @@
 import { db } from "@/db/db";
 import { runs } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
+import { ComfyDeploy } from "comfydeploy";
 
-export async function generateImage(prompt: string, endpoint: string, options: any) {
+const cd = new ComfyDeploy({
+  bearer: process.env.COMFY_DEPLOY_API_KEY!,
+});
+
+export async function generateImage(
+  prompt: string,
+  endpoint: string,
+  options: { height: number; width: number; lora: string; batchSize: number }
+) {
   const { userId } = auth();
-  if (!userId) throw new Error("Unauthorized");
+  if (!userId) throw new Error("User not found");
 
-  const run_id = crypto.randomUUID();
+  const { height, width, lora } = options;
 
   try {
-    // Iniciar la generación
-    const response = await fetch(`${endpoint}/api/cd/run`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.COMFY_DEPLOY_API_KEY}`
-      },
-      body: JSON.stringify({
-        deploymentId: options.deploymentId,
-        webhook: options.webhook,
-        inputs: options.deploymentId === "e322689e-065a-4d33-aa6a-ee941803ca95" 
-          ? {
-              prompt,
-              height: options.height,
-              width: options.width,
-            }
-          : options.inputs
-      }),
+    const result = await cd.run.queue({
+      deploymentId: "e322689e-065a-4d33-aa6a-ee941803ca95",
+      webhook: `${endpoint}/api/webhook`,
+      inputs: {
+        lora_strength: 0.5,
+        prompt,
+        lora: lora || "",
+        width,
+        height
+      }
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to start generation");
+    if (!result?.runId) {
+      throw new Error("No runId received from ComfyDeploy");
     }
 
-    // Si la generación se inició correctamente, guardar en la base de datos
     await db.insert(runs).values({
-      run_id,
+      run_id: result.runId,
       user_id: userId,
-      inputs: options.inputs || options,
       live_status: "queued",
-      progress: 0,
-      deployment_id: options.deploymentId
+      inputs: {
+        prompt,
+        height: height.toString(),
+        width: width.toString(),
+        lora,
+        lora_strength: "0.5"
+      },
     });
 
-    return run_id;
+    return result.runId;
   } catch (error) {
-    console.error("Error in generateImage:", error);
+    console.error("Error calling ComfyDeploy API:", error);
     throw error;
   }
 }
