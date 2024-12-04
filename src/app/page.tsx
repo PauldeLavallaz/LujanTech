@@ -6,38 +6,39 @@ import { motion } from "framer-motion";
 import { MoreVertical, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Onboarding } from "@/components/Onboarding";
+import { getUserRuns } from "@/server/getUserRuns";
+import useSWR from "swr";
+import Link from "next/link";
 
 interface Flow {
 	id: string;
 	name: string;
 	lastImage?: string;
 	status: "success" | "running" | "error";
-	updatedAt: string;
-	author: string;
+	path: string;
 }
-
-const flows: Flow[] = [
-	{
-		id: "basic",
-		name: "Comfy Platform",
-		lastImage: "/path/to/image.jpg", // Reemplazar con imágenes reales
-		status: "success",
-		updatedAt: "23 minutes ago",
-		author: "Paulde lavallaz"
-	},
-	{
-		id: "advanced",
-		name: "Karaoke",
-		lastImage: "/path/to/image2.jpg",
-		status: "success",
-		updatedAt: "an hour ago",
-		author: "Paulde lavallaz"
-	},
-	// ... más flujos
-];
 
 export default function Home() {
 	const { user, isSignedIn } = useUser();
+	const { data: userRuns } = useSWR("userRuns", getUserRuns);
+
+	// Convertir los runs en flujos
+	const flows: Flow[] = [
+		{
+			id: "basic",
+			name: "Generador Básico",
+			lastImage: userRuns?.[0]?.image_url,
+			status: "success",
+			path: "/basic"
+		},
+		{
+			id: "advanced",
+			name: "Generador Avanzado",
+			lastImage: userRuns?.[1]?.image_url,
+			status: "success",
+			path: "/advanced"
+		}
+	];
 
 	if (!isSignedIn) {
 		return <Onboarding />;
@@ -51,10 +52,6 @@ export default function Home() {
 					<h1 className="text-2xl font-bold">Flujos</h1>
 					<p className="text-gray-500">Gestiona tus flujos creativos</p>
 				</div>
-				<Button>
-					<Plus className="w-4 h-4 mr-2" />
-					Nuevo Flujo
-				</Button>
 			</div>
 
 			{/* Grid */}
@@ -66,40 +63,39 @@ export default function Home() {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.3 }}
 					>
-						<Card className="overflow-hidden group cursor-pointer">
-							{/* Image */}
-							<div className="aspect-[4/3] relative">
-								{flow.lastImage ? (
-									<img
-										src={flow.lastImage}
-										alt={flow.name}
-										className="w-full h-full object-cover"
-									/>
-								) : (
-									<div className="w-full h-full bg-gray-100 flex items-center justify-center">
-										<Plus className="w-8 h-8 text-gray-400" />
-									</div>
-								)}
-								<Button
-									variant="ghost"
-									size="icon"
-									className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-								>
-									<MoreVertical className="w-4 h-4" />
-								</Button>
-							</div>
+						<Link href={flow.path}>
+							<Card className="overflow-hidden group cursor-pointer">
+								{/* Image */}
+								<div className="aspect-[4/3] relative">
+									{flow.lastImage ? (
+										<img
+											src={flow.lastImage}
+											alt={flow.name}
+											className="w-full h-full object-cover"
+										/>
+									) : (
+										<div className="w-full h-full bg-gray-100 flex items-center justify-center">
+											<Plus className="w-8 h-8 text-gray-400" />
+										</div>
+									)}
+									<Button
+										variant="ghost"
+										size="icon"
+										className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+									>
+										<MoreVertical className="w-4 h-4" />
+									</Button>
+								</div>
 
-							{/* Info */}
-							<div className="p-4">
-								<div className="flex items-center justify-between mb-2">
-									<h3 className="font-medium">{flow.name}</h3>
-									<div className={`w-2 h-2 rounded-full bg-${flow.status === 'success' ? 'green' : flow.status === 'running' ? 'blue' : 'red'}-500`} />
+								{/* Info */}
+								<div className="p-4">
+									<div className="flex items-center justify-between mb-2">
+										<h3 className="font-medium">{flow.name}</h3>
+										<div className={`w-2 h-2 rounded-full bg-${flow.status === 'success' ? 'green' : flow.status === 'running' ? 'blue' : 'red'}-500`} />
+									</div>
 								</div>
-								<div className="text-sm text-gray-500">
-									{flow.updatedAt} • {flow.author}
-								</div>
-							</div>
-						</Card>
+							</Card>
+						</Link>
 					</motion.div>
 				))}
 			</div>
