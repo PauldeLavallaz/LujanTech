@@ -20,10 +20,17 @@ export function UserRuns() {
 					{userRuns?.map((run) => (
 						<div 
 							key={run.run_id} 
-							onClick={() => run.image_url && setSelectedImage(run.image_url)} 
 							className="cursor-pointer"
 						>
-							<ImageGenerationResult runId={run.run_id} />
+							<ImageGenerationResult 
+								runId={run.run_id}
+								onImageLoad={(imageUrl) => {
+									if (run.run_id === userRuns[0]?.run_id) {
+										setSelectedImage(imageUrl);
+									}
+								}}
+								onClick={() => run.image_url && setSelectedImage(run.image_url)}
+							/>
 						</div>
 					))}
 				</div>

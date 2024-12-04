@@ -6,10 +6,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
-export function ImageGenerationResult({
-  runId,
-  className,
-}: { runId: string } & React.ComponentProps<"div">) {
+interface ImageGenerationResultProps {
+  runId: string;
+  className?: string;
+  onImageLoad?: (imageUrl: string) => void;
+}
+
+export function ImageGenerationResult({ runId, className, onImageLoad }: ImageGenerationResultProps) {
   const [image, setImage] = useState("");
   const [status, setStatus] = useState<string>("queued");
   const [progress, setProgress] = useState<number>(0);
@@ -31,8 +34,10 @@ export function ImageGenerationResult({
         }
 
         if (data.outputs?.[0]?.data?.images?.[0]?.url) {
-          setImage(data.outputs[0].data.images[0].url);
+          const imageUrl = data.outputs[0].data.images[0].url;
+          setImage(imageUrl);
           setLoading(false);
+          onImageLoad?.(imageUrl);
           return true;
         }
 
@@ -51,7 +56,7 @@ export function ImageGenerationResult({
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [runId]);
+  }, [runId, onImageLoad]);
 
   return (
     <div
