@@ -5,7 +5,7 @@ import { loadSlim } from "tsparticles-slim";
 import Particles from "react-tsparticles";
 import type { Engine } from "tsparticles-engine";
 
-export default function ParticlesBackground() {
+export function ParticlesBackground() {
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadSlim(engine);
   }, []);
@@ -39,7 +39,7 @@ export default function ParticlesBackground() {
             },
           },
           number: {
-            value: window?.innerWidth < 768 ? 20 : 40,
+            value: 40,
             density: {
               enable: true,
               area: 800,

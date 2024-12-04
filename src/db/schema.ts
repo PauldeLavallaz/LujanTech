@@ -11,5 +11,6 @@ export const runs = sqliteTable("runs", {
 	inputs: text("inputs", { mode: "json" }).$type<Record<string, any>>(),
 	live_status: text("live_status"),  // Este es el estado que usaremos
 	progress: real("progress"),
+	deployment_id: text('deployment_id'),
   });
   

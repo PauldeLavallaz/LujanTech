@@ -116,7 +116,7 @@ export default function FranaticsGenerator() {
 
   return (
     <GeneratorLayout inputs={inputs}>
-      <UserRuns />
+      <UserRuns deploymentId="cec337bf-69d6-4886-97b0-acbeba47f1ec" />
     </GeneratorLayout>
   );
 } 

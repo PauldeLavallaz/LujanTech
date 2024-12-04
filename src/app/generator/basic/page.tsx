@@ -87,7 +87,7 @@ export default function BasicGenerator() {
 
   return (
     <GeneratorLayout inputs={inputs}>
-      <UserRuns />
+      <UserRuns deploymentId="basic-workflow" />
     </GeneratorLayout>
   );
 } 
