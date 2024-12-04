@@ -11,7 +11,7 @@ interface GeneratorLayoutProps {
 
 export function GeneratorLayout({ children, inputs }: GeneratorLayoutProps) {
   return (
-    <div className="flex h-screen">
+    <div className="flex-1 flex">
       {/* Área principal de imágenes generadas */}
       <ScrollArea className="flex-1 p-6">
         <div className="max-w-[1200px] mx-auto">
