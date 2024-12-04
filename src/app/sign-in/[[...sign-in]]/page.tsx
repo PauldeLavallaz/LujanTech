@@ -6,8 +6,8 @@ export default function Page() {
       <SignIn 
         path="/sign-in"
         routing="path"
-        redirectUrl="https://www.morfeolabs.com"
-        afterSignUpUrl="https://www.morfeolabs.com"
+        redirectUrl="/dashboard"
+        afterSignUpUrl="/dashboard"
         appearance={{
           elements: {
             rootBox: "mx-auto",
