@@ -19,64 +19,81 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
 
     setLoading(true);
     try {
-      // Primero, convertimos a base64
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+      // Crear FormData con el archivo
+      const formData = new FormData();
+      formData.append('file', file);
 
-      // Ahora subimos la imagen a un servidor temporal
-      const response = await fetch("/api/file/upload", {
+      // Subir directamente a ComfyDeploy
+      const response = await fetch("https://api.comfydeploy.com/api/file/upload", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_COMFY_DEPLOY_API_KEY}`
         },
-        body: JSON.stringify({ 
-          file: base64,
-          filename: file.name 
-        }),
+        body: formData
       });
 
       if (!response.ok) {
-        throw new Error("Error al subir la imagen");
+        const error = await response.json();
+        throw new Error(error.message || "Error al subir la imagen");
       }
 
       const data = await response.json();
-      onChange(data.file_url); // Usamos la URL devuelta por el servidor
+      console.log("Upload response:", data); // Para debug
+      
+      if (data.file_url) {
+        onChange(data.file_url);
+      } else {
+        throw new Error("No se recibió la URL de la imagen");
+      }
     } catch (error) {
-      console.error("Error:", error);
-      toast.error("Error al cargar la imagen");
+      console.error("Error al subir imagen:", error);
+      toast.error("Error al cargar la imagen. Por favor intenta nuevamente.");
     } finally {
       setLoading(false);
     }
   }, [onChange]);
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
       'image/*': ['.png', '.jpg', '.jpeg']
     },
-    maxFiles: 1
+    maxFiles: 1,
+    multiple: false
   });
 
   return (
-    <div
-      {...getRootProps()}
-      className="border-2 border-dashed rounded-lg p-4 hover:bg-gray-50 transition cursor-pointer"
+    <div 
+      {...getRootProps()} 
+      className={`
+        border-2 border-dashed rounded-lg p-4 transition-colors
+        ${isDragActive ? 'border-primary bg-primary/10' : 'border-gray-200 hover:bg-gray-50'}
+        ${loading ? 'opacity-50 cursor-wait' : 'cursor-pointer'}
+      `}
     >
       <input {...getInputProps()} />
       {value ? (
-        <img src={value} alt="Uploaded" className="w-full h-48 object-cover rounded-lg" />
+        <img 
+          src={value} 
+          alt="Preview" 
+          className="w-full h-48 object-cover rounded-lg"
+        />
       ) : (
         <div className="h-48 flex flex-col items-center justify-center gap-2 text-gray-500">
           {loading ? (
-            <div className="animate-pulse">Subiendo imagen...</div>
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" />
+              <span>Subiendo...</span>
+            </div>
           ) : (
             <>
               <Upload className="w-8 h-8" />
-              <p className="text-sm">Arrastrá o hacé click para subir tu selfie</p>
+              <p className="text-sm text-center">
+                {isDragActive ? 
+                  "Soltá la imagen aquí" : 
+                  "Arrastrá o hacé click para subir tu selfie"
+                }
+              </p>
             </>
           )}
         </div>
