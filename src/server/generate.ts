@@ -1,56 +1,50 @@
 import { db } from "@/db/db";
 import { runs } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm/expressions";
-import { ComfyDeploy } from "comfydeploy";
 
-const cd = new ComfyDeploy({
-  bearer: process.env.COMFY_DEPLOY_API_KEY!,
-});
-
-export async function generateImage(
-  prompt: string,
-  endpoint: string,
-  options: { height: number; width: number; lora: string; batchSize: number }
-) {
+export async function generateImage(prompt: string, endpoint: string, options: any) {
   const { userId } = auth();
-  if (!userId) throw new Error("User not found");
+  if (!userId) throw new Error("Unauthorized");
 
-  const { height, width, lora } = options;
+  // Crear el run en la base de datos
+  const run_id = crypto.randomUUID();
 
   try {
-    const result = await cd.run.queue({
-      deploymentId: "e322689e-065a-4d33-aa6a-ee941803ca95",
-      webhook: `${endpoint}/api/webhook`,
-      inputs: {
-        lora_strength: 0.5,
-        prompt,
-        lora: lora || "",
-        width,
-        height
-      }
+    // Iniciar la generación primero
+    const response = await fetch(`${endpoint}/api/cd/run`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        deploymentId: options.deploymentId,
+        inputs: {
+          prompt,
+          height: options.height,
+          width: options.width,
+          lora: options.lora || "",
+          lora_strength: options.lora_strength || 0.5,
+        },
+      }),
     });
 
-    if (!result?.runId) {
-      throw new Error("No runId received from ComfyDeploy");
+    if (!response.ok) {
+      throw new Error("Failed to start generation");
     }
 
+    // Si la generación se inició correctamente, guardar en la base de datos
     await db.insert(runs).values({
-      run_id: result.runId,
+      run_id,
       user_id: userId,
+      inputs: options,
       live_status: "queued",
-      inputs: {
-        prompt,
-        height: height.toString(),
-        width: width.toString(),
-        lora,
-        lora_strength: "0.5"
-      },
+      progress: 0,
+      deployment_id: options.deploymentId
     });
 
-    return result.runId;
+    return run_id;
   } catch (error) {
-    console.error("Error calling ComfyDeploy API:", error);
+    console.error("Error in generateImage:", error);
     throw error;
   }
 }

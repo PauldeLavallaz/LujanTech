@@ -28,7 +28,10 @@ export default function BasicGenerator() {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          deploymentId: "basic-workflow"
+        }),
       });
 
       const result = await response.json();
