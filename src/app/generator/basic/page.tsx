@@ -6,6 +6,7 @@ import { ImagePlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useUserGenerations } from "@/hooks/useUserGenerations";
+import { Generation } from '@/types/generation';
 
 const DEPLOYMENT_ID = "e322689e-065a-4d33-aa6a-ee941803ca95";
 
@@ -57,10 +58,10 @@ export default function BasicGeneratorPage() {
         <div className="flex-1">
           {generations.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {generations.map((gen, index) => (
+              {generations.map((gen: Generation, index: number) => (
                 <ImageGenerationResult
-                  key={gen.runId + index}
-                  runId={gen.runId}
+                  key={gen.run_id + index}
+                  runId={gen.run_id}
                 />
               ))}
             </div>

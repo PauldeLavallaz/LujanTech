@@ -1,6 +1,6 @@
 import { db } from "@/db/db";
 import { runs } from "@/db/schema";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { eq, and } from "drizzle-orm";
 
 export async function GET(request: Request) {
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
       ? and(eq(runs.user_id, userId), eq(runs.deployment_id, deploymentId))
       : eq(runs.user_id, userId);
 
-    const userRuns = await db.select().from(runs).where(query).orderBy(runs.created_at);
+    const userRuns = await db.select().from(runs).where(query).orderBy(runs.createdAt);
 
     return Response.json({ generations: userRuns });
   } catch (error) {

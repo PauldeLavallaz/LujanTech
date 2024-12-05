@@ -6,6 +6,7 @@ import { useState } from "react";
 import { FranaticsModal } from "@/components/FranaticsModal";
 import { toast } from "sonner";
 import { useUserGenerations } from "@/hooks/useUserGenerations";
+import { Generation } from '@/types/generation';
 
 interface FranaticsFormData {
   selfie: File | null;
@@ -73,10 +74,10 @@ export default function FranaticsPage() {
         <div className="flex-1">
           {generations.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {generations.map((gen, index) => (
+              {generations.map((gen: Generation, index: number) => (
                 <ImageGenerationResult
-                  key={gen.runId + index}
-                  runId={gen.runId}
+                  key={gen.run_id + index}
+                  runId={gen.run_id}
                 />
               ))}
             </div>
@@ -195,86 +196,6 @@ export default function FranaticsPage() {
             </button>
           </form>
         </div>
-      </div>
-
-      {/* Modal de generación (solo mobile) */}
-      <FranaticsModal
-        isOpen={isModalOpen}
-        <form 
-          className="hidden md:flex flex-col gap-4 w-80 sticky top-4 h-fit"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleGenerate(formData);
-          }}
-        >
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Tu Selfie</label>
-            <div className="border-2 border-dashed rounded-lg p-4 text-center">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setFormData(prev => ({ ...prev, selfie: file }));
-                  }
-                }}
-                className="hidden"
-                id="selfie-upload"
-              />
-              <label 
-                htmlFor="selfie-upload"
-                className="cursor-pointer text-sm text-gray-500"
-              >
-                Arrastra o haz click para subir tu selfie
-                <br />
-                <span className="text-xs">Máximo 5MB - JPG o PNG</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Nombre</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full p-2 border rounded-lg"
-              placeholder="Tu nombre completo"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Nacionalidad</label>
-            <input
-              type="text"
-              value={formData.nationality}
-              onChange={(e) => setFormData(prev => ({ ...prev, nationality: e.target.value }))}
-              className="w-full p-2 border rounded-lg"
-              placeholder="Tu nacionalidad"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Tu Franui Favorito</label>
-            <select
-              value={formData.favoriteProduct}
-              onChange={(e) => setFormData(prev => ({ ...prev, favoriteProduct: e.target.value }))}
-              className="w-full p-2 border rounded-lg"
-            >
-              <option value="Milk">Milk</option>
-              <option value="Dark">Dark</option>
-              <option value="White">White</option>
-            </select>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800"
-          >
-            Generar
-          </button>
-        </form>
       </div>
 
       {/* Modal de generación (solo mobile) */}
