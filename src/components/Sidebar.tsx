@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useAuth } from "@clerk/nextjs";
 import { 
   LayoutGrid, 
   Settings, 
@@ -37,6 +37,9 @@ const sidebarItems = [
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isSignedIn } = useAuth();
+
+  if (!isSignedIn) return null;
 
   return (
     <>
@@ -63,7 +66,7 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r transition-transform duration-200 ease-in-out",
+          "fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r transition-transform duration-200 ease-in-out flex flex-col",
           "md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
@@ -76,7 +79,7 @@ export function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-8">
+        <nav className="flex-1 p-4 space-y-8 overflow-y-auto">
           {sidebarItems.map((section) => (
             <div key={section.title}>
               <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
@@ -100,7 +103,7 @@ export function Sidebar() {
         </nav>
 
         {/* User - Fixed at bottom */}
-        <div className="p-4 border-t mt-auto">
+        <div className="p-4 border-t">
           <UserButton afterSignOutUrl="/" />
         </div>
       </aside>

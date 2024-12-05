@@ -4,15 +4,11 @@ import { GenerationModal } from "@/components/GenerationModal";
 import { ImageGenerationResult } from "@/components/ImageGenerationResult";
 import { ImagePlus } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function BasicGeneratorPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [generations, setGenerations] = useState<Array<{ runId: string }>>([]);
-  const [formData, setFormData] = useState({
-    prompt: "",
-    width: 896,
-    height: 1152,
-  });
 
   const handleGenerate = async (data: { prompt: string; width: number; height: number }) => {
     try {
@@ -21,22 +17,29 @@ export default function BasicGeneratorPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          deploymentId: "e322689e-065a-4d33-aa6a-ee941803ca95"
+        }),
       });
 
       if (!response.ok) throw new Error("Failed to generate");
 
-      const { runId } = await response.json();
-      setGenerations(prev => [{ runId }, ...prev]);
+      const result = await response.json();
+      if (result.run_id) {
+        setGenerations(prev => [{ runId: result.run_id }, ...prev]);
+        toast.success("¡Generación iniciada!");
+      }
     } catch (error) {
       console.error("Generation error:", error);
+      toast.error("Error al generar la imagen");
     }
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto p-4">
       {/* Header con botón de generar (solo mobile) */}
-      <div className="flex justify-between items-center mb-8 md:mb-12 pt-16 md:pt-0">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Generador Básico</h1>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -69,52 +72,59 @@ export default function BasicGeneratorPage() {
           )}
         </div>
 
-        {/* Formulario desktop (ahora a la derecha) */}
-        <form 
-          className="hidden md:flex flex-col gap-4 w-80 sticky top-4 h-fit"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleGenerate(formData);
-          }}
-        >
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Prompt</label>
-            <input
-              type="text"
-              value={formData.prompt}
-              onChange={(e) => setFormData(prev => ({ ...prev, prompt: e.target.value }))}
-              className="w-full p-2 border rounded-lg"
-              placeholder="Describe what you want to generate..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Width</label>
-            <input
-              type="number"
-              value={formData.width}
-              onChange={(e) => setFormData(prev => ({ ...prev, width: Number(e.target.value) }))}
-              className="w-full p-2 border rounded-lg"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Height</label>
-            <input
-              type="number"
-              value={formData.height}
-              onChange={(e) => setFormData(prev => ({ ...prev, height: Number(e.target.value) }))}
-              className="w-full p-2 border rounded-lg"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800"
+        {/* Formulario desktop (a la derecha) */}
+        <div className="hidden md:block w-80">
+          <form 
+            className="sticky top-4 space-y-4 bg-white p-4 rounded-lg border"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              handleGenerate({
+                prompt: formData.get('prompt') as string,
+                width: Number(formData.get('width')),
+                height: Number(formData.get('height'))
+              });
+            }}
           >
-            Generar
-          </button>
-        </form>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Prompt</label>
+              <input
+                name="prompt"
+                type="text"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Describe what you want to generate..."
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Width</label>
+              <input
+                name="width"
+                type="number"
+                defaultValue={896}
+                className="w-full p-2 border rounded-lg"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Height</label>
+              <input
+                name="height"
+                type="number"
+                defaultValue={1152}
+                className="w-full p-2 border rounded-lg"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800"
+            >
+              Generar
+            </button>
+          </form>
+        </div>
       </div>
 
       {/* Modal de generación (solo mobile) */}
