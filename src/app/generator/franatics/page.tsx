@@ -15,7 +15,7 @@ interface FranaticsFormData {
   favoriteProduct: string;
 }
 
-const DEPLOYMENT_ID = "franatics-deployment-id";
+const DEPLOYMENT_ID = "tu-deployment-id-de-franatics";
 
 export default function FranaticsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,18 +36,30 @@ export default function FranaticsPage() {
       formData.append("name", data.name);
       formData.append("nationality", data.nationality);
       formData.append("favoriteProduct", data.favoriteProduct);
-      formData.append("deploymentId", DEPLOYMENT_ID);
 
       const response = await fetch("/api/generate/franatics", {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Failed to generate");
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error);
+      }
 
       const result = await response.json();
       if (result.run_id) {
-        mutate();
+        mutate(prev => ({
+          generations: [{
+            run_id: result.run_id,
+            user_id: '',
+            deployment_id: DEPLOYMENT_ID,
+            live_status: 'queued',
+            inputs: data,
+            createdAt: new Date()
+          }, ...(prev?.generations || [])]
+        }), false);
+        
         toast.success("¡Generación iniciada!");
       }
     } catch (error) {
@@ -91,6 +103,7 @@ export default function FranaticsPage() {
                 <ImageGenerationResult
                   key={gen.run_id + index}
                   runId={gen.run_id}
+                  initialStatus={gen.live_status}
                 />
               ))}
             </div>
