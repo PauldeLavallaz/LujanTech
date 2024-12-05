@@ -82,7 +82,7 @@ export default function FranaticsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
+    <div className="container mx-auto px-4">
       {/* Header con botón de generar (solo mobile) */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Franatics</h1>
@@ -96,7 +96,7 @@ export default function FranaticsPage() {
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Grid de imágenes generadas */}
-        <div className="md:w-2/3">
+        <div className="md:w-[calc(100%-400px)]">
           {generations.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {generations.map((gen: Generation, index: number) => (
@@ -119,7 +119,7 @@ export default function FranaticsPage() {
         </div>
 
         {/* Formulario desktop (a la derecha) */}
-        <div className="hidden md:block md:w-1/3">
+        <div className="hidden md:block w-[400px]">
           <form 
             className="sticky top-4 space-y-4 bg-white p-6 rounded-lg border"
             onSubmit={handleSubmit}
@@ -203,7 +203,7 @@ export default function FranaticsPage() {
               >
                 <option value="Milk">Milk</option>
                 <option value="Dark">Dark</option>
-                <option value="White">White</option>
+                <option value="Pink">Pink</option>
               </select>
             </div>
 
@@ -224,6 +224,13 @@ export default function FranaticsPage() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleGenerate}
         title="Genera tu Avatar Franatics"
+        options={{
+          varieties: [
+            { value: "Milk", label: "Milk" },
+            { value: "Dark", label: "Dark" },
+            { value: "Pink", label: "Pink" },
+          ]
+        }}
       />
     </div>
   );

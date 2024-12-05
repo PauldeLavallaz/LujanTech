@@ -31,17 +31,8 @@ export default function BasicGeneratorPage() {
 
       const result = await response.json();
       if (result.run_id) {
-        mutate(prev => ({
-          generations: [{
-            run_id: result.run_id,
-            user_id: '',
-            deployment_id: DEPLOYMENT_ID,
-            live_status: 'queued',
-            inputs: data,
-            createdAt: new Date()
-          }, ...(prev?.generations || [])]
-        }), false);
-        
+        await mutate();
+        setIsModalOpen(false);
         toast.success("¡Generación iniciada!");
       }
     } catch (error) {
@@ -51,9 +42,9 @@ export default function BasicGeneratorPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
+    <div className="container mx-auto px-4">
       {/* Header con botón de generar (solo mobile) */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 pt-16 md:pt-0">
         <h1 className="text-2xl font-bold">Generador Básico</h1>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -64,10 +55,10 @@ export default function BasicGeneratorPage() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Grid de imágenes generadas */}
-        <div className="flex-1">
+        {/* Grid de imágenes */}
+        <div className="md:w-[calc(100%-400px)]">
           {generations.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {generations.map((gen: Generation, index: number) => (
                 <ImageGenerationResult
                   key={gen.run_id + index}
@@ -87,10 +78,10 @@ export default function BasicGeneratorPage() {
           )}
         </div>
 
-        {/* Formulario desktop (a la derecha) */}
-        <div className="hidden md:block w-80">
+        {/* Formulario desktop */}
+        <div className="hidden md:block w-[400px]">
           <form 
-            className="sticky top-4 space-y-4 bg-white p-4 rounded-lg border"
+            className="sticky top-4 space-y-4 bg-white p-6 rounded-lg border"
             onSubmit={(e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);

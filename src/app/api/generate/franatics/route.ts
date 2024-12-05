@@ -1,5 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
 import { generateFranatics } from "@/server/generateFranatics";
+import { ComfyDeploy } from "comfydeploy";
+
+const cd = new ComfyDeploy({
+  bearer: process.env.COMFY_DEPLOY_API_KEY!,
+});
 
 export async function POST(request: Request) {
   try {
@@ -18,15 +23,30 @@ export async function POST(request: Request) {
       return new Response("Missing required fields", { status: 400 });
     }
 
-    // Primero necesitamos subir la imagen y obtener una URL
-    // Aquí deberías implementar la lógica para subir la imagen a un servicio
-    // y obtener una URL pública
-    const selfieUrl = "https://example.com/temp.jpg"; // Reemplazar con la URL real
+    // Subir la imagen a ComfyDeploy
+    const buffer = await selfie.arrayBuffer();
+    const fileData = new FormData();
+    fileData.append('file', new Blob([buffer]), selfie.name);
 
+    const uploadResponse = await fetch('https://api.comfydeploy.com/api/file/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.COMFY_DEPLOY_API_KEY}`
+      },
+      body: fileData
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Failed to upload image');
+    }
+
+    const { file_url } = await uploadResponse.json();
+
+    // Generar con la URL de la imagen
     const runId = await generateFranatics(
       request.headers.get("origin") || "",
       {
-        selfie: selfieUrl,
+        selfie: file_url,
         name,
         nationality,
         variety: favoriteProduct
