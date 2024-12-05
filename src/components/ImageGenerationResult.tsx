@@ -32,33 +32,16 @@ export function ImageGenerationResult({
 
     const checkStatus = async () => {
       try {
-        const response = await fetch(`/api/cd/run/${runId}`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch status');
-        }
-
+        const response = await fetch(`/api/cd/run/${runId}`);
         const data = await response.json();
         
-        // Actualizar estado y progreso
         if (data.status) {
           setStatus(data.status);
           setProgress(data.progress || 0);
         }
 
-        // Verificar si hay imagen
         if (data.outputs?.[0]?.data?.images?.[0]?.url) {
           setImage(data.outputs[0].data.images[0].url);
-          setLoading(false);
-          return true;
-        }
-
-        // Si hay error, detener el polling
-        if (data.status === 'error') {
           setLoading(false);
           return true;
         }
@@ -75,18 +58,13 @@ export function ImageGenerationResult({
     // Hacer el primer check inmediatamente
     checkStatus();
 
-    // Iniciar polling
     const interval = setInterval(checkStatus, 2000);
 
     return () => clearInterval(interval);
   }, [runId, initialImageUrl]);
 
-  // No mostrar nada si no hay runId
-  if (!runId) return null;
-
   return (
     <div className={cn("relative", className)}>
-      {/* Imagen completada */}
       {!loading && image && (
         <div className="aspect-square">
           <img 
@@ -98,7 +76,6 @@ export function ImageGenerationResult({
         </div>
       )}
       
-      {/* Estado de generación */}
       {!loading && !image && (
         <div className="aspect-square border rounded-lg flex flex-col items-center justify-center gap-2 px-4 bg-gray-50">
           <div className="flex items-center justify-center gap-2 text-gray-600">
@@ -118,14 +95,12 @@ export function ImageGenerationResult({
         </div>
       )}
 
-      {/* Estado inicial de carga */}
       {loading && (
         <div className="aspect-square">
           <Skeleton className="w-full h-full rounded-lg" />
         </div>
       )}
 
-      {/* Modal para ver la imagen */}
       {isModalOpen && image && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
