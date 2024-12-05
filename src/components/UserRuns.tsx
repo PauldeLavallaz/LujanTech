@@ -8,12 +8,14 @@ import { ImageModal } from "./ImageModal";
 import { useState } from "react";
 
 interface UserRunsProps {
-	deploymentId?: string; // Para filtrar por generador
+	deploymentId?: string;
 }
 
 export function UserRuns({ deploymentId }: UserRunsProps) {
 	const { data: userRuns } = useSWR("userRuns", getUserRuns, {
-		refreshInterval: 5000
+		refreshInterval: 5000,
+		revalidateOnFocus: false,
+		revalidateIfStale: false
 	});
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -30,13 +32,12 @@ export function UserRuns({ deploymentId }: UserRunsProps) {
 						<div 
 							key={run.run_id} 
 							className="cursor-pointer"
+							onClick={() => run.image_url && setSelectedImage(run.image_url)}
 						>
 							<ImageGenerationResult 
 								runId={run.run_id}
-								onImageLoad={(imageUrl) => {
-									// Ya no actualizamos selectedImage automáticamente
-								}}
-								onClick={() => run.image_url && setSelectedImage(run.image_url)}
+								initialStatus={run.live_status}
+								initialImageUrl={run.image_url}
 							/>
 						</div>
 					))}

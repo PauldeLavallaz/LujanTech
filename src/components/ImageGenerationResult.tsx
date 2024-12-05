@@ -9,26 +9,31 @@ import { useEffect, useState } from "react";
 interface ImageGenerationResultProps {
   runId: string;
   className?: string;
-  onImageLoad?: (imageUrl: string) => void;
+  initialStatus?: string;
+  initialImageUrl?: string;
   onClick?: () => void;
 }
 
-export function ImageGenerationResult({ runId, className, onImageLoad, onClick }: ImageGenerationResultProps) {
-  const [image, setImage] = useState("");
-  const [status, setStatus] = useState<string>("queued");
+export function ImageGenerationResult({ 
+  runId, 
+  className, 
+  initialStatus,
+  initialImageUrl,
+  onClick 
+}: ImageGenerationResultProps) {
+  const [image, setImage] = useState(initialImageUrl || "");
+  const [status, setStatus] = useState<string>(initialStatus || "queued");
   const [progress, setProgress] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialImageUrl);
 
   useEffect(() => {
-    if (!runId) return;
+    if (!runId || initialImageUrl) return; // No polling si ya tenemos la imagen
 
     const checkStatus = async () => {
       try {
         const response = await fetch(`/api/cd/run/${runId}`);
         const data = await response.json();
         
-        console.log("[Status Check] Response:", data);
-
         if (data.status) {
           setStatus(data.status);
           setProgress(data.progress || 0);
@@ -38,7 +43,6 @@ export function ImageGenerationResult({ runId, className, onImageLoad, onClick }
           const imageUrl = data.outputs[0].data.images[0].url;
           setImage(imageUrl);
           setLoading(false);
-          onImageLoad?.(imageUrl);
           return true;
         }
 
@@ -57,7 +61,7 @@ export function ImageGenerationResult({ runId, className, onImageLoad, onClick }
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [runId, onImageLoad]);
+  }, [runId, initialImageUrl]);
 
   return (
     <div
