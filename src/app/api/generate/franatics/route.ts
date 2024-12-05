@@ -1,8 +1,5 @@
-import { db } from "@/db/db";
-import { runs } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
-
-const DEPLOYMENT_ID = "franatics-deployment-id"; // Reemplazar con el ID correcto del deployment de Franatics
+import { generateFranatics } from "@/server/generateFranatics";
 
 export async function POST(request: Request) {
   try {
@@ -21,30 +18,24 @@ export async function POST(request: Request) {
       return new Response("Missing required fields", { status: 400 });
     }
 
-    // Aquí iría la lógica para subir la imagen a un servicio de almacenamiento
-    // y obtener la URL de la imagen subida
-    // const selfieUrl = await uploadImage(selfie);
+    // Primero necesitamos subir la imagen y obtener una URL
+    // Aquí deberías implementar la lógica para subir la imagen a un servicio
+    // y obtener una URL pública
+    const selfieUrl = "https://example.com/temp.jpg"; // Reemplazar con la URL real
 
-    // Crear el run en la base de datos
-    const run = await db.insert(runs).values({
-      run_id: crypto.randomUUID(),
-      user_id: userId,
-      deployment_id: DEPLOYMENT_ID,
-      live_status: "queued",
-      inputs: {
-        // selfieUrl,
+    const runId = await generateFranatics(
+      request.headers.get("origin") || "",
+      {
+        selfie: selfieUrl,
         name,
         nationality,
-        favoriteProduct
-      },
-    }).returning().get();
+        variety: favoriteProduct
+      }
+    );
 
-    // Aquí iría la lógica para iniciar la generación del avatar
-    // const generation = await startFranaticsGeneration(run.run_id, selfieUrl, name, nationality, favoriteProduct);
-
-    return Response.json({ run_id: run.run_id });
+    return Response.json({ run_id: runId });
   } catch (error) {
     console.error("Generation error:", error);
-    return new Response("Error generating avatar", { status: 500 });
+    return new Response(error instanceof Error ? error.message : "Error generating avatar", { status: 500 });
   }
 } 
