@@ -13,9 +13,10 @@ async function main() {
   console.log(" Starting database migration...");
 
   try {
-    // Recrear la tabla
+    // Ejecutar las sentencias una por una
+    await client.execute(`DROP TABLE IF EXISTS runs;`);
+    
     await client.execute(`
-      DROP TABLE IF EXISTS runs;
       CREATE TABLE runs (
         run_id TEXT PRIMARY KEY NOT NULL,
         user_id TEXT NOT NULL,
@@ -25,7 +26,7 @@ async function main() {
         live_status TEXT,
         progress REAL,
         deployment_id TEXT
-      );
+      )
     `);
 
     console.log("✅ Migration completed successfully!");
