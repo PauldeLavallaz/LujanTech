@@ -6,11 +6,17 @@ import { X } from "lucide-react";
 interface FranaticsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { selfie: File | null; name: string; nationality: string; favoriteProduct: string }) => void;
+  onSubmit: (data: FranaticsFormData) => Promise<void>;
   title?: string;
+  options?: {
+    varieties: Array<{
+      value: string;
+      label: string;
+    }>;
+  };
 }
 
-export function FranaticsModal({ isOpen, onClose, onSubmit, title = "Genera tu Avatar Franatics" }: FranaticsModalProps) {
+export function FranaticsModal({ isOpen, onClose, onSubmit, title = "Genera tu Avatar Franatics", options }: FranaticsModalProps) {
   const [formData, setFormData] = useState({
     selfie: null as File | null,
     name: "",
@@ -88,13 +94,23 @@ export function FranaticsModal({ isOpen, onClose, onSubmit, title = "Genera tu A
           <div className="space-y-2">
             <label className="block text-sm font-medium">Tu Franui Favorito</label>
             <select
-              value={formData.favoriteProduct}
-              onChange={(e) => setFormData(prev => ({ ...prev, favoriteProduct: e.target.value }))}
+              name="favoriteProduct"
               className="w-full p-2 border rounded-lg"
+              required
             >
-              <option value="Milk">Milk</option>
-              <option value="Dark">Dark</option>
-              <option value="White">White</option>
+              {options?.varieties ? (
+                options.varieties.map(variety => (
+                  <option key={variety.value} value={variety.value}>
+                    {variety.label}
+                  </option>
+                ))
+              ) : (
+                <>
+                  <option value="Milk">Milk</option>
+                  <option value="Dark">Dark</option>
+                  <option value="Pink">Pink</option>
+                </>
+              )}
             </select>
           </div>
 

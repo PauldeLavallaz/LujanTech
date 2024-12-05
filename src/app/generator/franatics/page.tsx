@@ -49,17 +49,8 @@ export default function FranaticsPage() {
 
       const result = await response.json();
       if (result.run_id) {
-        mutate(prev => ({
-          generations: [{
-            run_id: result.run_id,
-            user_id: '',
-            deployment_id: DEPLOYMENT_ID,
-            live_status: 'queued',
-            inputs: data,
-            createdAt: new Date()
-          }, ...(prev?.generations || [])]
-        }), false);
-        
+        await mutate();
+        setIsModalOpen(false);
         toast.success("¡Generación iniciada!");
       }
     } catch (error) {
