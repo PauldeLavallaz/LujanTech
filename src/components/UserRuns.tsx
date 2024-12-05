@@ -36,8 +36,8 @@ export function UserRuns({ deploymentId }: UserRunsProps) {
 						>
 							<ImageGenerationResult 
 								runId={run.run_id}
-								initialStatus={run.live_status}
-								initialImageUrl={run.image_url}
+								initialStatus={run.live_status || undefined}
+								initialImageUrl={run.image_url || undefined}
 							/>
 						</div>
 					))}
