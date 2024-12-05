@@ -2,6 +2,7 @@
 
 import { GenerationModal } from "@/components/GenerationModal";
 import { ImageGenerationResult } from "@/components/ImageGenerationResult";
+import { ImagePlus } from "lucide-react";
 import { useState } from "react";
 
 export default function BasicGeneratorPage() {
@@ -35,11 +36,11 @@ export default function BasicGeneratorPage() {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Header con botón de generar (solo mobile) */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-8 md:mb-12 pt-16 md:pt-0">
         <h1 className="text-2xl font-bold">Generador Básico</h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="md:hidden bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+          className="md:hidden bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800"
         >
           Generar
         </button>
@@ -47,13 +48,25 @@ export default function BasicGeneratorPage() {
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Grid de imágenes generadas */}
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {generations.map((gen, index) => (
-            <ImageGenerationResult
-              key={gen.runId + index}
-              runId={gen.runId}
-            />
-          ))}
+        <div className="flex-1">
+          {generations.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {generations.map((gen, index) => (
+                <ImageGenerationResult
+                  key={gen.runId + index}
+                  runId={gen.runId}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed rounded-lg p-8 text-center text-gray-500">
+              <ImagePlus className="w-12 h-12 mb-4" />
+              <h3 className="text-lg font-medium mb-2">No hay imágenes generadas</h3>
+              <p className="text-sm max-w-md">
+                Haz click en el botón &quot;Generar&quot; para crear tu primera imagen con IA
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Formulario desktop (ahora a la derecha) */}
