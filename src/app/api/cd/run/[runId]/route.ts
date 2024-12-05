@@ -1,17 +1,21 @@
 import { ComfyDeploy } from "comfydeploy";
-import { NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
 
 const cd = new ComfyDeploy({
   bearer: process.env.COMFY_DEPLOY_API_KEY!,
 });
 
-export async function GET(
-  request: NextRequest,
-  context: { params: { runId: string } }
-) {
+type Props = {
+  params: {
+    runId: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export async function GET(request: NextRequest, props: Props) {
   try {
     const data = await cd.run.get({
-      runId: context.params.runId
+      runId: props.params.runId
     });
     return Response.json(data);
   } catch (error) {
