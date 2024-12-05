@@ -5,13 +5,19 @@ const cd = new ComfyDeploy({
   bearer: process.env.COMFY_DEPLOY_API_KEY!,
 });
 
+type RouteContext = {
+  params: {
+    runId: string;
+  };
+};
+
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { runId: string } }
+  _request: NextRequest,
+  context: RouteContext
 ) {
   try {
     const data = await cd.run.get({
-      runId: params.runId
+      runId: context.params.runId
     });
     return Response.json(data);
   } catch (error) {

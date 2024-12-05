@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import { FranaticsFormData } from "@/types/franatics";
 
 interface FranaticsModalProps {
   isOpen: boolean;

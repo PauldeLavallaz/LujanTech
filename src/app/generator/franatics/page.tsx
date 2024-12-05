@@ -7,13 +7,7 @@ import { FranaticsModal } from "@/components/FranaticsModal";
 import { toast } from "sonner";
 import { useUserGenerations } from "@/hooks/useUserGenerations";
 import { Generation } from '@/types/generation';
-
-interface FranaticsFormData {
-  selfie: File | null;
-  name: string;
-  nationality: string;
-  favoriteProduct: string;
-}
+import { FranaticsFormData } from "@/types/franatics";
 
 const DEPLOYMENT_ID = "cec337bf-69d6-4886-97b0-acbeba47f1ec";
 
