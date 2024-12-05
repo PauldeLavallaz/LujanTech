@@ -1,9 +1,11 @@
 "use client";
 
 import { ImageGenerationResult } from "@/components/ImageGenerationResult";
-import { ImagePlus } from "lucide-react";
+import { ImagePlus, Upload } from "lucide-react";
 import { useState } from "react";
 import { FranaticsModal } from "@/components/FranaticsModal";
+import { toast } from "sonner";
+import { useUserGenerations } from "@/hooks/useUserGenerations";
 
 interface FranaticsFormData {
   selfie: File | null;
@@ -12,15 +14,19 @@ interface FranaticsFormData {
   favoriteProduct: string;
 }
 
+const DEPLOYMENT_ID = "franatics-deployment-id";
+
 export default function FranaticsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [generations, setGenerations] = useState<Array<{ runId: string }>>([]);
-  const [formData, setFormData] = useState<FranaticsFormData>({
-    selfie: null,
-    name: "",
-    nationality: "",
-    favoriteProduct: "Milk",
-  });
+  const { generations, mutate } = useUserGenerations(DEPLOYMENT_ID);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+  };
 
   const handleGenerate = async (data: FranaticsFormData) => {
     try {
@@ -29,6 +35,7 @@ export default function FranaticsPage() {
       formData.append("name", data.name);
       formData.append("nationality", data.nationality);
       formData.append("favoriteProduct", data.favoriteProduct);
+      formData.append("deploymentId", DEPLOYMENT_ID);
 
       const response = await fetch("/api/generate/franatics", {
         method: "POST",
@@ -37,17 +44,21 @@ export default function FranaticsPage() {
 
       if (!response.ok) throw new Error("Failed to generate");
 
-      const { runId } = await response.json();
-      setGenerations(prev => [{ runId }, ...prev]);
+      const result = await response.json();
+      if (result.run_id) {
+        mutate();
+        toast.success("¡Generación iniciada!");
+      }
     } catch (error) {
       console.error("Generation error:", error);
+      toast.error("Error al generar el avatar");
     }
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto p-4">
       {/* Header con botón de generar (solo mobile) */}
-      <div className="flex justify-between items-center mb-8 md:mb-12 pt-16 md:pt-0">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Franatics</h1>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -81,6 +92,114 @@ export default function FranaticsPage() {
         </div>
 
         {/* Formulario desktop (a la derecha) */}
+        <div className="hidden md:block w-80">
+          <form 
+            className="sticky top-4 space-y-4 bg-white p-4 rounded-lg border"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const form = e.currentTarget;
+              handleGenerate({
+                selfie: selectedFile,
+                name: form.name.value,
+                nationality: form.nationality.value,
+                favoriteProduct: form.favoriteProduct.value
+              });
+            }}
+          >
+            {/* File Upload Area */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Tu Selfie</label>
+              <div 
+                className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors ${
+                  previewUrl ? 'border-green-500' : 'border-gray-300'
+                }`}
+                onClick={() => document.getElementById('selfie-upload')?.click()}
+              >
+                <input
+                  id="selfie-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileSelect(file);
+                  }}
+                />
+                
+                {previewUrl ? (
+                  <div className="relative aspect-square w-full max-w-[200px] mx-auto">
+                    <img 
+                      src={previewUrl} 
+                      alt="Preview" 
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
+                      <p className="text-white text-sm">Cambiar imagen</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-4">
+                    <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                    <p className="text-sm text-gray-500">
+                      Arrastra o haz click para subir tu selfie
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Máximo 5MB - JPG o PNG
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Nombre</label>
+              <input
+                name="name"
+                type="text"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Tu nombre completo"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Nacionalidad</label>
+              <input
+                name="nationality"
+                type="text"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Tu nacionalidad"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Tu Franui Favorito</label>
+              <select
+                name="favoriteProduct"
+                className="w-full p-2 border rounded-lg"
+                required
+              >
+                <option value="Milk">Milk</option>
+                <option value="Dark">Dark</option>
+                <option value="White">White</option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800"
+              disabled={!selectedFile}
+            >
+              Generar
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Modal de generación (solo mobile) */}
+      <FranaticsModal
+        isOpen={isModalOpen}
         <form 
           className="hidden md:flex flex-col gap-4 w-80 sticky top-4 h-fit"
           onSubmit={(e) => {

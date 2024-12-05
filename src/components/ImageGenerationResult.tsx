@@ -79,7 +79,7 @@ export function ImageGenerationResult({
         </div>
       )}
       
-      {!image && (
+      {!loading && !image && (
         <div className="aspect-square border rounded-lg flex flex-col items-center justify-center gap-2 px-4 bg-gray-50">
           <div className="flex items-center justify-center gap-2 text-gray-600">
             {status === "queued" && "En cola..."}
@@ -95,7 +95,7 @@ export function ImageGenerationResult({
         </div>
       )}
 
-      {loading && !image && (
+      {loading && (
         <div className="aspect-square">
           <Skeleton className="w-full h-full rounded-lg" />
         </div>

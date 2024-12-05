@@ -5,10 +5,13 @@ import { ImageGenerationResult } from "@/components/ImageGenerationResult";
 import { ImagePlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useUserGenerations } from "@/hooks/useUserGenerations";
+
+const DEPLOYMENT_ID = "e322689e-065a-4d33-aa6a-ee941803ca95";
 
 export default function BasicGeneratorPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [generations, setGenerations] = useState<Array<{ runId: string }>>([]);
+  const { generations, mutate } = useUserGenerations(DEPLOYMENT_ID);
 
   const handleGenerate = async (data: { prompt: string; width: number; height: number }) => {
     try {
@@ -19,7 +22,7 @@ export default function BasicGeneratorPage() {
         },
         body: JSON.stringify({
           ...data,
-          deploymentId: "e322689e-065a-4d33-aa6a-ee941803ca95"
+          deploymentId: DEPLOYMENT_ID
         }),
       });
 
@@ -27,7 +30,7 @@ export default function BasicGeneratorPage() {
 
       const result = await response.json();
       if (result.run_id) {
-        setGenerations(prev => [{ runId: result.run_id }, ...prev]);
+        mutate();
         toast.success("¡Generación iniciada!");
       }
     } catch (error) {
