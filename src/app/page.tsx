@@ -6,17 +6,15 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { ArrowRight, Sparkles, CreditCard, Stars } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 const dreamMachines = [
   {
     id: "basic-generator",
     name: "Generador Básico",
-    description: "Crea imágenes usando prompts, loras y ajustes de tamaño. Perfecto para empezar.",
+    description: "Generá imagenes con Flux. Determiná el tamaño e ingresá tu prompt. Perfecto para empezar.",
     icon: <Sparkles className="w-8 h-8" />,
     path: "/generator/basic",
-    status: "stable",
-    features: ["Prompts en español", "Selección de Loras", "Ajustes de tamaño"]
+    features: ["Prompt simple", "Ajuste de tamaño"]
   },
   {
     id: "franatics",
@@ -24,7 +22,6 @@ const dreamMachines = [
     description: "¿Sos un verdadero fan de Franui? Generá tu credencial de Franatic",
     icon: <CreditCard className="w-8 h-8" />,
     path: "/generator/franatics",
-    status: "beta",
     features: ["Cargá tu selfie", "Completá tus datos", "Elegí tu Franui favorito"]
   }
 ];
@@ -32,12 +29,10 @@ const dreamMachines = [
 export default function Home() {
   const { isSignedIn, user } = useUser();
 
-  // Si no está autenticado, mostramos el onboarding
   if (!isSignedIn) {
     return <Onboarding />;
   }
 
-  // Si está autenticado, mostramos el dashboard
   return (
     <div className="min-h-screen">
       {/* Welcome Section */}
@@ -66,13 +61,6 @@ export default function Home() {
             {dreamMachines.map((machine) => (
               <Link key={machine.id} href={machine.path}>
                 <Card className="p-8 hover:shadow-xl transition-all duration-300 cursor-pointer group relative overflow-hidden">
-                  {/* Status Badge */}
-                  <div className="absolute top-4 right-4">
-                    <Badge variant={machine.status === "stable" ? "default" : "secondary"}>
-                      {machine.status === "stable" ? "Estable" : "Beta"}
-                    </Badge>
-                  </div>
-
                   {/* Icon & Title */}
                   <div className="flex items-center gap-4 mb-4">
                     <div className="p-3 bg-black text-white rounded-xl group-hover:scale-110 transition-transform">

@@ -1,6 +1,5 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 
 interface ImageModalProps {
@@ -11,30 +10,30 @@ interface ImageModalProps {
 export function ImageModal({ imageUrl, onClose }: ImageModalProps) {
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        {/* Contenedor de la imagen */}
-        <div 
-          className="relative max-w-[90vw] max-h-[90vh]"
-          onClick={e => e.stopPropagation()} // Evita que el click en la imagen cierre el modal
+      <div 
+        className="relative max-w-[90vw] max-h-[90vh] w-auto h-auto"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Botón de cerrar */}
+        <button
+          onClick={onClose}
+          className="absolute -top-12 right-0 p-2 text-white/80 hover:text-white transition-colors"
+          aria-label="Cerrar"
         >
-          {/* Botón de cerrar */}
-          <button
-            onClick={onClose}
-            className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          <X className="w-8 h-8" />
+        </button>
 
-          {/* Imagen */}
+        {/* Contenedor de la imagen con ratio automático */}
+        <div className="relative w-auto h-auto">
           <img
             src={imageUrl}
-            alt="Generated image"
-            className="rounded-lg object-contain max-h-[85vh] w-auto mx-auto"
+            alt="Imagen generada"
+            className="rounded-lg object-contain max-w-[90vw] max-h-[85vh] w-auto h-auto"
             style={{
-              boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)'
+              boxShadow: '0 0 30px rgba(0, 0, 0, 0.3)'
             }}
           />
         </div>
