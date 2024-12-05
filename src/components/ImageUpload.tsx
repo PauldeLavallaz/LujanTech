@@ -19,28 +19,14 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
 
     setLoading(true);
     try {
-      // Primero convertimos a base64
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = reader.result as string;
-          const base64Data = result.split(',')[1];
-          resolve(base64Data);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+      // Crear FormData
+      const formData = new FormData();
+      formData.append('file', file);
 
-      // Subir a ComfyDeploy
-      const response = await fetch("/api/file/upload", {  // Cambiado a nuestro endpoint
+      // Subir archivo
+      const response = await fetch("/api/file/upload", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          file: base64,
-          filename: file.name
-        })
+        body: formData
       });
 
       if (!response.ok) {
