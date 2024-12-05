@@ -2,7 +2,6 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { X } from "lucide-react";
-import { Button } from "./ui/button";
 
 interface ImageModalProps {
   imageUrl: string;
@@ -11,27 +10,35 @@ interface ImageModalProps {
 
 export function ImageModal({ imageUrl, onClose }: ImageModalProps) {
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 border-none bg-transparent">
-        <div className="relative">
-          {/* Botón de cerrar personalizado */}
-          <Button
-            variant="ghost"
-            size="icon"
+    <div 
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        {/* Contenedor de la imagen */}
+        <div 
+          className="relative max-w-[90vw] max-h-[90vh]"
+          onClick={e => e.stopPropagation()} // Evita que el click en la imagen cierre el modal
+        >
+          {/* Botón de cerrar */}
+          <button
             onClick={onClose}
-            className="absolute -top-10 right-0 rounded-full bg-white/10 hover:bg-white/20 text-white z-50"
+            className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300 transition-colors"
           >
-            <X className="h-4 w-4" />
-          </Button>
+            <X className="w-6 h-6" />
+          </button>
 
           {/* Imagen */}
           <img
             src={imageUrl}
             alt="Generated image"
-            className="rounded-lg max-h-[85vh] w-auto object-contain mx-auto"
+            className="rounded-lg object-contain max-h-[85vh] w-auto mx-auto"
+            style={{
+              boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)'
+            }}
           />
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 } 

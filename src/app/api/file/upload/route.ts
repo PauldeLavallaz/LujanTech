@@ -4,8 +4,7 @@ export async function POST(request: NextRequest) {
   try {
     const { file, filename } = await request.json();
 
-    // Aquí deberías subir el archivo a tu servicio de almacenamiento
-    // Por ahora, enviamos la imagen directamente a ComfyDeploy
+    // Subir a ComfyDeploy
     const response = await fetch("https://api.comfydeploy.com/api/file/upload", {
       method: "POST",
       headers: {
@@ -13,17 +12,22 @@ export async function POST(request: NextRequest) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        file: file,
-        filename: filename
+        file,
+        filename
       })
     });
 
     if (!response.ok) {
+      const error = await response.json();
+      console.error("ComfyDeploy error:", error);
       throw new Error("Error uploading file to ComfyDeploy");
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+    return NextResponse.json({
+      file_url: data.url,
+      message: "File uploaded successfully"
+    });
   } catch (error) {
     console.error("Error uploading file:", error);
     return NextResponse.json(

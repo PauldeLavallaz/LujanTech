@@ -19,17 +19,28 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
 
     setLoading(true);
     try {
-      // Crear FormData
-      const formData = new FormData();
-      formData.append('file', file);
+      // Primero convertimos a base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          const base64Data = result.split(',')[1];
+          resolve(base64Data);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
       // Subir a ComfyDeploy
-      const response = await fetch("https://api.comfydeploy.com/api/file/upload", {
+      const response = await fetch("/api/file/upload", {  // Cambiado a nuestro endpoint
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_COMFY_DEPLOY_API_KEY}`
+          "Content-Type": "application/json"
         },
-        body: formData
+        body: JSON.stringify({
+          file: base64,
+          filename: file.name
+        })
       });
 
       if (!response.ok) {
@@ -39,8 +50,8 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       const data = await response.json();
       console.log("Upload response:", data);
 
-      if (data.url) {
-        onChange(data.url);
+      if (data.file_url) {
+        onChange(data.file_url);
         toast.success("Imagen cargada exitosamente");
       } else {
         throw new Error("No se recibió la URL de la imagen");
