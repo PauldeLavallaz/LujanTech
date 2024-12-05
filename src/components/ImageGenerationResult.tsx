@@ -32,17 +32,33 @@ export function ImageGenerationResult({
 
     const checkStatus = async () => {
       try {
-        const response = await fetch(`/api/cd/run/${runId}`);
+        const response = await fetch(`/api/cd/run/${runId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch status');
+        }
+
         const data = await response.json();
         
+        // Actualizar estado y progreso
         if (data.status) {
           setStatus(data.status);
           setProgress(data.progress || 0);
         }
 
+        // Verificar si hay imagen
         if (data.outputs?.[0]?.data?.images?.[0]?.url) {
-          const imageUrl = data.outputs[0].data.images[0].url;
-          setImage(imageUrl);
+          setImage(data.outputs[0].data.images[0].url);
+          setLoading(false);
+          return true;
+        }
+
+        // Si hay error, detener el polling
+        if (data.status === 'error') {
           setLoading(false);
           return true;
         }
@@ -50,24 +66,27 @@ export function ImageGenerationResult({
         return false;
       } catch (error) {
         console.error("[Status Check] Error:", error);
-        return false;
+        setStatus("error");
+        setLoading(false);
+        return true;
       }
     };
 
+    // Hacer el primer check inmediatamente
     checkStatus();
 
-    const interval = setInterval(async () => {
-      const imageFound = await checkStatus();
-      if (imageFound) {
-        clearInterval(interval);
-      }
-    }, 2000);
+    // Iniciar polling
+    const interval = setInterval(checkStatus, 2000);
 
     return () => clearInterval(interval);
   }, [runId, initialImageUrl]);
 
+  // No mostrar nada si no hay runId
+  if (!runId) return null;
+
   return (
     <div className={cn("relative", className)}>
+      {/* Imagen completada */}
       {!loading && image && (
         <div className="aspect-square">
           <img 
@@ -79,14 +98,18 @@ export function ImageGenerationResult({
         </div>
       )}
       
+      {/* Estado de generación */}
       {!loading && !image && (
         <div className="aspect-square border rounded-lg flex flex-col items-center justify-center gap-2 px-4 bg-gray-50">
           <div className="flex items-center justify-center gap-2 text-gray-600">
             {status === "queued" && "En cola..."}
-            {status === "processing" && "Procesando..."}
+            {status === "running" && "Procesando..."}
+            {status === "uploading" && "Finalizando..."}
             {status === "completed" && "¡Completado!"}
             {status === "error" && "¡Ocurrió un error!"}
-            <LoadingIcon />
+            {(status === "queued" || status === "running" || status === "uploading") && (
+              <LoadingIcon />
+            )}
           </div>
           <Progress value={progress * 100} className="h-[2px] w-full" />
           <span className="text-sm text-center text-gray-400">
@@ -95,12 +118,14 @@ export function ImageGenerationResult({
         </div>
       )}
 
+      {/* Estado inicial de carga */}
       {loading && (
         <div className="aspect-square">
           <Skeleton className="w-full h-full rounded-lg" />
         </div>
       )}
 
+      {/* Modal para ver la imagen */}
       {isModalOpen && image && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"

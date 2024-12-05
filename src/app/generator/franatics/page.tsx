@@ -15,7 +15,7 @@ interface FranaticsFormData {
   favoriteProduct: string;
 }
 
-const DEPLOYMENT_ID = "tu-deployment-id-de-franatics";
+const DEPLOYMENT_ID = "cec337bf-69d6-4886-97b0-acbeba47f1ec";
 
 export default function FranaticsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,9 +96,9 @@ export default function FranaticsPage() {
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Grid de imágenes generadas */}
-        <div className="flex-1">
+        <div className="md:w-2/3">
           {generations.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {generations.map((gen: Generation, index: number) => (
                 <ImageGenerationResult
                   key={gen.run_id + index}
@@ -119,9 +119,9 @@ export default function FranaticsPage() {
         </div>
 
         {/* Formulario desktop (a la derecha) */}
-        <div className="hidden md:block w-80">
+        <div className="hidden md:block md:w-1/3">
           <form 
-            className="sticky top-4 space-y-4 bg-white p-4 rounded-lg border"
+            className="sticky top-4 space-y-4 bg-white p-6 rounded-lg border"
             onSubmit={handleSubmit}
           >
             {/* File Upload Area */}
