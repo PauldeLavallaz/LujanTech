@@ -1,9 +1,9 @@
 "use client";
 
-import { GenerationModal } from "@/components/GenerationModal";
 import { ImageGenerationResult } from "@/components/ImageGenerationResult";
 import { ImagePlus } from "lucide-react";
 import { useState } from "react";
+import { FranaticsModal } from "@/components/FranaticsModal";
 
 interface FranaticsFormData {
   selfie: File | null;
@@ -159,7 +159,7 @@ export default function FranaticsPage() {
       </div>
 
       {/* Modal de generación (solo mobile) */}
-      <GenerationModal
+      <FranaticsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleGenerate}
