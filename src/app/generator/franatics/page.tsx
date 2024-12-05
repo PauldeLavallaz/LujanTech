@@ -56,6 +56,19 @@ export default function FranaticsPage() {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formElement = e.currentTarget;
+    const formData = new FormData(formElement);
+
+    handleGenerate({
+      selfie: selectedFile,
+      name: formData.get('name') as string,
+      nationality: formData.get('nationality') as string,
+      favoriteProduct: formData.get('favoriteProduct') as string
+    });
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-4">
       {/* Header con botón de generar (solo mobile) */}
@@ -96,16 +109,7 @@ export default function FranaticsPage() {
         <div className="hidden md:block w-80">
           <form 
             className="sticky top-4 space-y-4 bg-white p-4 rounded-lg border"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const form = e.currentTarget;
-              handleGenerate({
-                selfie: selectedFile,
-                name: form.name.value,
-                nationality: form.nationality.value,
-                favoriteProduct: form.favoriteProduct.value
-              });
-            }}
+            onSubmit={handleSubmit}
           >
             {/* File Upload Area */}
             <div className="space-y-2">
@@ -153,8 +157,9 @@ export default function FranaticsPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium">Nombre</label>
+              <label htmlFor="name" className="block text-sm font-medium">Nombre</label>
               <input
+                id="name"
                 name="name"
                 type="text"
                 className="w-full p-2 border rounded-lg"
@@ -164,8 +169,9 @@ export default function FranaticsPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium">Nacionalidad</label>
+              <label htmlFor="nationality" className="block text-sm font-medium">Nacionalidad</label>
               <input
+                id="nationality"
                 name="nationality"
                 type="text"
                 className="w-full p-2 border rounded-lg"
@@ -175,8 +181,9 @@ export default function FranaticsPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium">Tu Franui Favorito</label>
+              <label htmlFor="favoriteProduct" className="block text-sm font-medium">Tu Franui Favorito</label>
               <select
+                id="favoriteProduct"
                 name="favoriteProduct"
                 className="w-full p-2 border rounded-lg"
                 required
