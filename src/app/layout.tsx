@@ -24,25 +24,23 @@ export default function RootLayout({
 
 		return (
 			<div className="flex min-h-screen">
-				{isSignedIn && !isPublicRoute && <Sidebar />}
-				<main className={`flex-1 ${isSignedIn && !isPublicRoute ? 'ml-64' : ''}`}>
-					<div className="max-w-7xl mx-auto px-4 py-8">
-						{children}
-					</div>
+				<Sidebar />
+				<main className="flex-1 p-4 md:ml-64">
+					{children}
 				</main>
 			</div>
 		);
 	}
 
 	return (
-		<html lang="es">
-			<body className={inter.className}>
-				<ClerkProvider>
+		<ClerkProvider>
+			<html lang="es">
+				<body>
 					<LayoutContent>{children}</LayoutContent>
 					<Toaster />
-				</ClerkProvider>
-			</body>
-		</html>
+				</body>
+			</html>
+		</ClerkProvider>
 	);
 }
 

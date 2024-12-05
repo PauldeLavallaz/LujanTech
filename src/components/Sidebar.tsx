@@ -1,73 +1,79 @@
-import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
-import { 
-  LayoutGrid, 
-  Settings, 
-  Database, 
-  KeyRound,
-  BarChart,
-  Workflow,
-  Sparkles,
-  CreditCard
-} from "lucide-react";
+"use client";
 
-const sidebarItems = [
-  {
-    title: "APLICACIÓN",
-    items: [
-      { name: "Flujos", icon: <Workflow className="w-4 h-4" />, href: "/" },
-      { name: "Generador Básico", icon: <Sparkles className="w-4 h-4" />, href: "/generator/basic" },
-      { name: "Franatics", icon: <CreditCard className="w-4 h-4" />, href: "/generator/franatics" },
-    ]
-  },
-  {
-    title: "CUENTA",
-    items: [
-      { name: "Configuración", icon: <Settings className="w-4 h-4" />, href: "/settings" },
-      { name: "API Keys", icon: <KeyRound className="w-4 h-4" />, href: "/api-keys" },
-      { name: "Uso", icon: <Database className="w-4 h-4" />, href: "/usage" },
-    ]
-  }
-];
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+import Link from "next/link";
+import { Menu, X } from "lucide-react";
 
 export function Sidebar() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <aside className="w-64 bg-white border-r fixed h-screen flex flex-col">
-      {/* Logo */}
-      <div className="p-4 border-b">
-        <Link href="/" className="text-xl font-bold">
-          Morfeo Dreams Lab
-        </Link>
-      </div>
+    <>
+      {/* Botón de menú móvil */}
+      <button
+        className="fixed top-4 left-4 z-50 md:hidden"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? (
+          <X className="h-6 w-6" />
+        ) : (
+          <Menu className="h-6 w-6" />
+        )}
+      </button>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-8">
-        {sidebarItems.map((section) => (
-          <div key={section.title}>
-            <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-              {section.title}
-            </h2>
-            <ul className="space-y-2">
-              {section.items.map((item) => (
-                <li key={item.name}>
-                  <Link 
-                    href={item.href}
-                    className="flex items-center gap-3 text-sm text-gray-600 hover:text-black hover:bg-gray-50 rounded-md p-2 transition-colors"
-                  >
-                    {item.icon}
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+      {/* Overlay para cerrar el menú en móvil */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r transition-transform duration-200 ease-in-out",
+          "md:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="p-4 pt-20 md:pt-4">
+          <h1 className="text-xl font-bold mb-8">Morfeo Dreams Lab</h1>
+          
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-sm font-semibold text-gray-500 mb-2">APLICACIÓN</h2>
+              <nav className="space-y-2">
+                <Link href="/flujos" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                  <span>Flujos</span>
+                </Link>
+                <Link href="/generator/basic" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                  <span>Generador Básico</span>
+                </Link>
+                <Link href="/franatics" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                  <span>Franatics</span>
+                </Link>
+              </nav>
+            </div>
+
+            <div>
+              <h2 className="text-sm font-semibold text-gray-500 mb-2">CUENTA</h2>
+              <nav className="space-y-2">
+                <Link href="/configuracion" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                  <span>Configuración</span>
+                </Link>
+                <Link href="/api-keys" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                  <span>API Keys</span>
+                </Link>
+                <Link href="/uso" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                  <span>Uso</span>
+                </Link>
+              </nav>
+            </div>
           </div>
-        ))}
-      </nav>
-
-      {/* User - Fixed at bottom */}
-      <div className="p-4 border-t mt-auto">
-        <UserButton afterSignOutUrl="/" />
-      </div>
-    </aside>
+        </div>
+      </aside>
+    </>
   );
 } 
