@@ -19,36 +19,21 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
 
     setLoading(true);
     try {
-      // Convertir a base64
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = reader.result as string;
-          // Extraer solo la parte de datos del base64
-          const base64Data = result.split(',')[1];
-          resolve(base64Data);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+      // Crear FormData
+      const formData = new FormData();
+      formData.append('file', file);
 
       // Subir a ComfyDeploy
       const response = await fetch("https://api.comfydeploy.com/api/file/upload", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_COMFY_DEPLOY_API_KEY}`,
-          "Content-Type": "application/json"
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_COMFY_DEPLOY_API_KEY}`
         },
-        body: JSON.stringify({
-          file: base64,
-          filename: file.name
-        })
+        body: formData
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        console.error("Error response:", error);
-        throw new Error(error.message || "Error al subir la imagen");
+        throw new Error("Error al subir la imagen");
       }
 
       const data = await response.json();
@@ -56,6 +41,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
 
       if (data.url) {
         onChange(data.url);
+        toast.success("Imagen cargada exitosamente");
       } else {
         throw new Error("No se recibió la URL de la imagen");
       }
@@ -88,11 +74,16 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
     >
       <input {...getInputProps()} />
       {value ? (
-        <img 
-          src={value} 
-          alt="Preview" 
-          className="w-full h-48 object-cover rounded-lg"
-        />
+        <div className="relative group">
+          <img 
+            src={value} 
+            alt="Preview" 
+            className="w-full h-48 object-cover rounded-lg"
+          />
+          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center text-white">
+            Click para cambiar
+          </div>
+        </div>
       ) : (
         <div className="h-48 flex flex-col items-center justify-center gap-2 text-gray-500">
           {loading ? (
@@ -110,7 +101,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                 }
               </p>
               <p className="text-xs text-gray-400">
-                Máximo 5MB
+                Máximo 5MB - JPG o PNG
               </p>
             </>
           )}

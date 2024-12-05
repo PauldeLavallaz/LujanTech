@@ -11,7 +11,9 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "bun run seed.mts",
-    "generate": "drizzle-kit generate:sqlite"
+    "generate": "drizzle-kit generate:sqlite",
+    "db:generate": "drizzle-kit generate:sqlite",
+    "db:push": "bun run src/db/migrate.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^5.2.13",
